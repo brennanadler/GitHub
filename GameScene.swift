@@ -3,7 +3,7 @@
 //  GitHub
 //
 //  Created by Brennan Adler on 1/20/15.
-//  Copyright (c) 2015 Brennan Adler. All rights reserved.
+//  Copyright (c) 2015 Brennan Adler and Sean Rayment. All rights reserved.
 //
 
 import SpriteKit

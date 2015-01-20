@@ -4,7 +4,7 @@
 //
 //  Created by Brennan Adler on 1/20/15.
 //  Copyright (c) 2015 Brennan Adler and Sean Rayment. All rights reserved.
-//
+//  This will now appear on Brennan's computer
 
 import SpriteKit
 

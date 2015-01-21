@@ -11,8 +11,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate
   
   override func didMoveToView(view: SKView)
   {
-    // setup physics/gravity
-    self.physicsWorld.gravity = CGVectorMake(0.0, -2)
+    // setup physics/gravity WAITING TILL WE MAKE GROUND
+    //self.physicsWorld.gravity = CGVectorMake(0.0, -2)
     
     TheGame = SKNode()
     self.addChild(TheGame)
@@ -27,37 +27,51 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     hero.position = CGPointMake(frame.width / 2.5, frame.height / 4.0)
     
     // Enable physics around our hero using a circle to draw our radius
-    hero.physicsBody = SKPhysicsBody(circleOfRadius: hero.size.height / 2.75)
-    hero.physicsBody?.dynamic = true
+    //hero.physicsBody = SKPhysicsBody(circleOfRadius: hero.size.height / 2.75)
+    //hero.physicsBody?.dynamic = true
     
     self.addChild(hero)
     runForward()
   }
   
-  override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
-  {
-    
-    for touch: AnyObject in touches
+   override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
     {
-      // Do jump
-      let jumping = SKAction.animateWithTextures([
-        heroAtlas.textureNamed("running1"),
-        heroAtlas.textureNamed("running2"),
-        heroAtlas.textureNamed("running3"),
-        heroAtlas.textureNamed("jumping1"),
-        heroAtlas.textureNamed("jumping2")
-        ], timePerFrame: 0.06)
-
-        let jump = SKAction.repeatAction(jumping, count: 1)
-      
-      if (hero.actionForKey("jumping") == nil)
-      {
-        hero.runAction(jump, withKey: "jumping")
-        hero.physicsBody?.velocity = CGVectorMake(0, 0)
-        hero.physicsBody?.applyImpulse(CGVectorMake(0, 200))
-      }
+        
+        for touch: AnyObject in touches
+        {
+            
+            let location = touch.locationInNode(self)
+            var sprites = nodesAtPoint(location)
+            for sprite in sprites {
+                if let spriteNode = sprite as? SKSpriteNode {
+                    if spriteNode.name != nil {
+                        if spriteNode.name == "jump" {
+                            
+                            // Do jump
+                            let jumping = SKAction.animateWithTextures([
+                                heroAtlas.textureNamed("running1"),
+                                heroAtlas.textureNamed("running2"),
+                                heroAtlas.textureNamed("running3"),
+                                heroAtlas.textureNamed("jumping1"),
+                                heroAtlas.textureNamed("jumping2")
+                                ], timePerFrame: 0.06)
+                            
+                            let jump = SKAction.repeatAction(jumping, count: 1)
+                            
+                            if (hero.actionForKey("jumping") == nil)
+                            {
+                                hero.runAction(jump, withKey: "jumping")
+                                hero.physicsBody?.velocity = CGVectorMake(0, 0)
+                                hero.physicsBody?.applyImpulse(CGVectorMake(0, 200))
+                            }
+                            
+                        }
+                    }
+                }
+            }
+        }
     }
-  }
+    
   func addJumpButton(){
     var jump: SKSpriteNode!
     jump = SKSpriteNode(imageNamed: "jumpButton")

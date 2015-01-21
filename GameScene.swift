@@ -18,6 +18,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     self.addChild(TheGame)
     
     createSky()
+    addJumpButton()
     
     //initializes our hero and sets his initial texture to running1
     hero = SKSpriteNode(texture: heroAtlas.textureNamed("running1"))
@@ -56,6 +57,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         hero.physicsBody?.applyImpulse(CGVectorMake(0, 200))
       }
     }
+  }
+  func addJumpButton(){
+    var jump: SKSpriteNode!
+    jump = SKSpriteNode(texture: imageNamed: "jumpButton")
+    jump.position = CGPointMake(frame.width / 1.3, frame.height / 5.0)
+    self.addChild(jump)
   }
   
   func runForward()

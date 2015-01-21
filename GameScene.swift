@@ -60,7 +60,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
   }
   func addJumpButton(){
     var jump: SKSpriteNode!
-    jump = SKSpriteNode(texture: imageNamed: "jumpButton")
+    jump = SKSpriteNode(imageNamed: "jumpButton")
     jump.position = CGPointMake(frame.width / 1.3, frame.height / 5.0)
     self.addChild(jump)
   }

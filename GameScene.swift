@@ -108,7 +108,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
                         let jump = SKAction.repeatAction(jumping, count: 1)
     
     
-                        if (hero.actionForKey("jumping") == nil && mana > 80)
+                        if (hero.actionForKey("jumping") == nil && mana > 70)
                         {
                             mana = mana - 70
                             hero.runAction(jump, withKey: "jumping")

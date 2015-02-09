@@ -148,6 +148,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         hero.runAction(run, withKey: "running")
     }
     
+    func playRunningAudio()
+    {
+        let hero_run_sound = SKAction.playSoundFilenamed("", waitForCompletion: True)
+        
+    }
+    
     func createGround()
     {
         let groundTexture = SKTexture(imageNamed: "bg")

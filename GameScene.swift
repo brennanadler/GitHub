@@ -2,7 +2,7 @@ import SpriteKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate
 {
-    
+    var point: CGPoint!
     var TheGame: SKNode!
     
     let heroAtlas = SKTextureAtlas(named: "wizard.atlas")
@@ -135,7 +135,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     
     func fireBall(){
         if mana >= 40 {
-            let sprite = Fireball.createFireBall(fireBallPoint)
+            let sprite = Fireball.createFireBall(point)
             self.addChild(sprite)
             mana = mana - 40
         }
@@ -211,6 +211,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
         updateManaBar()
+        point = CGPointMake(hero.position.x + 20, hero.position.y + 50)
     }
     
     //updates mana bar itself

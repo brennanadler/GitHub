@@ -20,7 +20,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     var manaSize: CGSize!
     var manaWidth: CGFloat!
     
-    
+    var fireBallPoint: CGPoint!
     
     override func didMoveToView(view: SKView)
     {
@@ -32,7 +32,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         
         createSky()
         createGround()
+        //addFireButton()
         addJumpButton()
+        
         //addManaOverlay()
         
         
@@ -45,7 +47,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         //creates some CG values for the hero to be used in its physics definitions
         let heroSize = CGSizeMake(hero.size.width, hero.size.height)
         let heroCenter = CGPointMake(hero.position.x/2, hero.position.y/2)
-       
+        
+        fireBallPoint = CGPointMake(hero.position.x + 20, hero.position.y + 75)
+        
         hero.physicsBody = SKPhysicsBody(rectangleOfSize: heroSize, center: heroCenter)
         hero.physicsBody?.dynamic = true
         hero.physicsBody?.mass = 5
@@ -74,11 +78,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             
             let location = touch.locationInNode(self)
             var sprites = nodesAtPoint(location)
+            if location.x < frame.width/2 {
+                fireBall()
+            }
             for sprite in sprites {
                 if let spriteNode = sprite as? SKSpriteNode {
                     if spriteNode.name != nil {
                         if spriteNode.name == "jump" {
-                            
                             
                             // Do jump
                             let jumping = SKAction.animateWithTextures([
@@ -114,6 +120,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate
                                 hero.physicsBody?.velocity = CGVectorMake(0, 0)
                                 hero.physicsBody?.applyImpulse(CGVectorMake(0, 3300))
                             }
+                        
+                        }
+                        //I have no idea why this doesn't work so I commented
+                        //out the code that adds the button
+                        else if spriteNode.name == "fire" {
+                            fireBall()
                         }
                     }
                 }
@@ -121,13 +133,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         }
     }
     
+    func fireBall(){
+        if mana >= 40 {
+            let sprite = Fireball.createFireBall(fireBallPoint)
+            self.addChild(sprite)
+            mana = mana - 40
+        }
+    }
     
     func addJumpButton(){
         var jump: SKSpriteNode!
         jump = SKSpriteNode(imageNamed: "jumpButton")
-        jump.position = CGPointMake(frame.width / 1.1, frame.height / 5.0)
+        jump.position = CGPointMake(frame.width / 1.1, frame.height / 3.75)
         jump.name = "jump"
+        jump.xScale = 0.8
+        jump.yScale = 0.8
         self.addChild(jump)
+    }
+    
+    func addFireButton(){
+        var fire: SKSpriteNode!
+        fire = SKSpriteNode(imageNamed: "fireButton")
+        fire.position = CGPointMake(frame.width / 1.25, frame.height / 4.75)
+        fire.xScale = 0.8
+        fire.yScale = 0.8
+        self.addChild(fire)
     }
     
     func addManaOverlay(){

@@ -14,7 +14,7 @@ class Fireball: SKSpriteNode {
         if let physics = sprite.physicsBody {
             physics.affectedByGravity = false
             physics.allowsRotation = false
-            physics.velocity = CGVectorMake(500, 0)
+            physics.velocity = CGVectorMake(600, 0)
         }
         
         sprite.xScale = 2.0

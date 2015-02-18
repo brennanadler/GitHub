@@ -22,8 +22,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     var fireBallPoint: CGPoint!
     var point: CGPoint!
     
+    var time: Int!
+    var frames: Int!
+    
     override func didMoveToView(view: SKView)
     {
+        frames = 0
+        time = 0
+        
         // setup physics/gravity
         self.physicsWorld.gravity = CGVectorMake(0.0, -7)
         
@@ -47,9 +53,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         let heroSize = CGSizeMake(hero.size.width, hero.size.height)
         let heroCenter = CGPointMake(hero.position.x/2, hero.position.y/2)
         
-        //makes point for fireball to spawn
-        fireBallPoint = CGPointMake(hero.position.x + 20, hero.position.y + 75)
-        
         hero.physicsBody = SKPhysicsBody(rectangleOfSize: heroSize, center: heroCenter)
         hero.physicsBody?.dynamic = true
         hero.physicsBody?.mass = 4
@@ -59,7 +62,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         mana = 0
         maxMana = 100
         manaPercent = (mana/maxMana)*100
-        manaRegen = (5/30)
+        manaRegen = (10)
         
         manaWidth = manaPercent
         manaSize = CGSize(width: manaWidth, height: 30)
@@ -145,6 +148,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         }
     }
     
+    func spawnEnemy(){
+        let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/2)
+        let sprite = Enemy.createEnemy(endOfScreen)
+        self.addChild(sprite)
+    }
+    
     func addJumpButton(){
         var jump: SKSpriteNode!
         jump = SKSpriteNode(texture: heroAtlas.textureNamed("jump_button"))
@@ -216,8 +225,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
         updateManaBar()
+        point = CGPointMake(hero.position.x + 50, hero.position.y + 10)
+        frames = frames + 1
+        calculateTime()
+        print(time)
 
-        point = CGPointMake(hero.position.x + 20, hero.position.y + 50)
     }
     
     //updates mana bar itself
@@ -243,5 +255,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         
     }
     
+    func calculateTime(){
+        if frames >= 30{
+            frames = frames - 30
+            time = time + 1
+            spawnEnemy()
+        }
+    }
+
     
 }

@@ -149,7 +149,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     }
     
     func spawnEnemy(){
-        let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/2)
+        let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/3.5)
         let sprite = Enemy.createEnemy(endOfScreen)
         self.addChild(sprite)
     }
@@ -224,11 +224,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
+        
+        //calls update manabar
         updateManaBar()
+        
+        //updates the CGpoint of hero's coordinates
         point = CGPointMake(hero.position.x + 50, hero.position.y + 10)
+        
+        //adds a frame before every frame to keep track of time
         frames = frames + 1
+        
+        //calculates time in seconds
         calculateTime()
-        print(time)
 
     }
     
@@ -255,13 +262,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         
     }
     
+    //function to calculate time in seconds
     func calculateTime(){
+        
+        //if frames = 30 or higher (30 FPS) adds 1 to seconds
         if frames >= 30{
             frames = frames - 30
             time = time + 1
             spawnEnemy()
         }
     }
-
     
 }

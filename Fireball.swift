@@ -3,9 +3,11 @@ import SpriteKit
 
 class Fireball: SKSpriteNode {
     
+    
     class func createFireBall(location: CGPoint) -> Fireball {
+        let heroAtlas = SKTextureAtlas(named: "wizard.atlas")
         
-        let sprite = Fireball(imageNamed: "fireball")
+        let sprite = Fireball(texture: heroAtlas.textureNamed("fireball1"))
         sprite.position = location
         let spriteSize = CGSizeMake(sprite.size.width, sprite.size.height)
         let spriteCenter = CGPointMake(sprite.position.x/2, sprite.position.y/2)

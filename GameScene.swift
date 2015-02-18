@@ -32,10 +32,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         
         createSky()
         createGround()
-        //addFireButton()
+        addFireButton()
         addJumpButton()
         
-        //addManaOverlay()
+        addManaOverlay()
         
         
         //initializes our hero and sets his initial texture to running1
@@ -43,7 +43,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         hero.xScale = 0.5
         hero.yScale = 0.5
         hero.position = CGPointMake(frame.width / 4.0, frame.height / 4.0)
-       
+        
         //creates some CG values for the hero to be used in its physics definitions
         let heroSize = CGSizeMake(hero.size.width, hero.size.height)
         let heroCenter = CGPointMake(hero.position.x/2, hero.position.y/2)
@@ -52,7 +52,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         
         hero.physicsBody = SKPhysicsBody(rectangleOfSize: heroSize, center: heroCenter)
         hero.physicsBody?.dynamic = true
-        hero.physicsBody?.mass = 5
+        hero.physicsBody?.mass = 4
         hero.physicsBody?.restitution = 0
         
         //init Mana Color
@@ -63,7 +63,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         
         manaWidth = manaPercent
         manaSize = CGSize(width: manaWidth, height: 30)
-        manaBar = SKSpriteNode(color: UIColor(red: 255/255, green: 70/255, blue: 10/255, alpha: 1.0), size: manaSize)
+        manaBar = SKSpriteNode(color: UIColor(red: 20/255, green: 20/255, blue: 255/255, alpha: 1.0), size: manaSize)
         self.addChild(manaBar)
         
         self.addChild(hero);
@@ -99,6 +99,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
@@ -113,19 +118,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate
                             let jump = SKAction.repeatAction(jumping, count: 1)
                             
                             
-                            if (hero.actionForKey("jumping") == nil && mana > 70)
+                            if (hero.actionForKey("jumping") == nil)
                             {
-                                mana = mana - 10
                                 hero.runAction(jump, withKey: "jumping")
                                 hero.physicsBody?.velocity = CGVectorMake(0, 0)
                                 hero.physicsBody?.applyImpulse(CGVectorMake(0, 3300))
                             }
-                        
+                            
                         }
-                        //I have no idea why this doesn't work so I commented
-                        //out the code that adds the button
+                            //I have no idea why this doesn't work so I commented
+                            //out the code that adds the button
                         else if spriteNode.name == "fire" {
-                            fireBall()
+                                fireBall()
+                            
                         }
                     }
                 }
@@ -143,25 +148,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     
     func addJumpButton(){
         var jump: SKSpriteNode!
-        jump = SKSpriteNode(imageNamed: "jumpButton")
+        jump = SKSpriteNode(texture: heroAtlas.textureNamed("jump_button"))
         jump.position = CGPointMake(frame.width / 1.1, frame.height / 3.75)
         jump.name = "jump"
-        jump.xScale = 0.8
-        jump.yScale = 0.8
+        jump.xScale = 0.3
+        jump.yScale = 0.3
         self.addChild(jump)
     }
     
     func addFireButton(){
         var fire: SKSpriteNode!
-        fire = SKSpriteNode(imageNamed: "fireButton")
-        fire.position = CGPointMake(frame.width / 1.25, frame.height / 4.75)
-        fire.xScale = 0.8
-        fire.yScale = 0.8
+        fire = SKSpriteNode(texture: heroAtlas.textureNamed("fire_button"))
+        fire.name = "fire"
+        fire.position = CGPointMake(frame.width / 1.25, frame.height / 3.75)
+        fire.xScale = 0.3
+        fire.yScale = 0.3
         self.addChild(fire)
     }
     
     func addManaOverlay(){
-        manaOver = SKSpriteNode(texture: heroAtlas.textureNamed("mana_bar_1"))
+        manaOver = SKSpriteNode(texture: heroAtlas.textureNamed("mana_bar"))
         manaOver.position = CGPointMake(frame.width / 8.4, frame.height / 1.24)
         manaOver.physicsBody?.dynamic = false;
         self.addChild(manaOver)

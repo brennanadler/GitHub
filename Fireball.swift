@@ -19,6 +19,15 @@ class Fireball: SKSpriteNode {
             physics.velocity = CGVectorMake(600, 0)
         }
         
+        let fireball_anim = SKAction.animateWithTextures([
+            heroAtlas.textureNamed("fireball1"),
+            heroAtlas.textureNamed("fireball2")
+            ], timePerFrame: 0.06)
+        
+        let run = SKAction.repeatActionForever(fireball_anim)
+        
+        sprite.runAction(run, withKey: "fire")
+        
         sprite.xScale = 2.0
         sprite.yScale = 2.0
         

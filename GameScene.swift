@@ -2,7 +2,6 @@ import SpriteKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate
 {
-    var point: CGPoint!
     var TheGame: SKNode!
     
     let heroAtlas = SKTextureAtlas(named: "wizard.atlas")
@@ -21,6 +20,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     var manaWidth: CGFloat!
     
     var fireBallPoint: CGPoint!
+    var point: CGPoint!
     
     override func didMoveToView(view: SKView)
     {
@@ -34,7 +34,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         createGround()
         addFireButton()
         addJumpButton()
-        
         addManaOverlay()
         
         
@@ -48,6 +47,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         let heroSize = CGSizeMake(hero.size.width, hero.size.height)
         let heroCenter = CGPointMake(hero.position.x/2, hero.position.y/2)
         
+        //makes point for fireball to spawn
         fireBallPoint = CGPointMake(hero.position.x + 20, hero.position.y + 75)
         
         hero.physicsBody = SKPhysicsBody(rectangleOfSize: heroSize, center: heroCenter)
@@ -56,10 +56,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         hero.physicsBody?.restitution = 0
         
         //init Mana Color
-        mana = 50
+        mana = 0
         maxMana = 100
-        manaPercent = 50
-        manaRegen = 1
+        manaPercent = (mana/maxMana)*100
+        manaRegen = (5/30)
         
         manaWidth = manaPercent
         manaSize = CGSize(width: manaWidth, height: 30)
@@ -78,9 +78,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             
             let location = touch.locationInNode(self)
             var sprites = nodesAtPoint(location)
-            if location.x < frame.width/2 {
-                fireBall()
-            }
+           
             for sprite in sprites {
                 if let spriteNode = sprite as? SKSpriteNode {
                     if spriteNode.name != nil {
@@ -128,6 +126,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
                         }
                             //I have no idea why this doesn't work so I commented
                             //out the code that adds the button
+                            // IT WORKS, #BrennanFixesAllOfSeansPoorCode
                         else if spriteNode.name == "fire" {
                                 fireBall()
                             
@@ -160,7 +159,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         var fire: SKSpriteNode!
         fire = SKSpriteNode(texture: heroAtlas.textureNamed("fire_button"))
         fire.name = "fire"
-        fire.position = CGPointMake(frame.width / 1.25, frame.height / 3.75)
+        fire.position = CGPointMake(frame.width / 10.0, frame.height / 3.75)
         fire.xScale = 0.3
         fire.yScale = 0.3
         self.addChild(fire)
@@ -217,6 +216,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
         updateManaBar()
+
         point = CGPointMake(hero.position.x + 20, hero.position.y + 50)
     }
     

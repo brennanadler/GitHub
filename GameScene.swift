@@ -81,7 +81,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             
             let location = touch.locationInNode(self)
             var sprites = nodesAtPoint(location)
-           
+            
             for sprite in sprites {
                 if let spriteNode = sprite as? SKSpriteNode {
                     if spriteNode.name != nil {
@@ -131,8 +131,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
                             //out the code that adds the button
                             // IT WORKS, #BrennanFixesAllOfSeansPoorCode
                         else if spriteNode.name == "fire" {
-                                fireBall()
-                            
+                            fireBall()
                         }
                     }
                 }
@@ -142,6 +141,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     
     func fireBall(){
         if mana >= 40 {
+            let firing = SKAction.animateWithTextures([
+                heroAtlas.textureNamed("mini_wizard_firing"),
+                heroAtlas.textureNamed("mini_wizard_firing")
+                ], timePerFrame: 0.12)
+            
+             let fire = SKAction.repeatAction(firing, count: 1)
+            
+            if (hero.actionForKey("firing") == nil)
+            {
+                hero.runAction(fire, withKey: "jumping")
+                hero.physicsBody?.velocity = CGVectorMake(0, 0)
+            }
+            
             let sprite = Fireball.createFireBall(point)
             self.addChild(sprite)
             mana = mana - 40
@@ -236,7 +248,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         
         //calculates time in seconds
         calculateTime()
-
+        
     }
     
     //updates mana bar itself

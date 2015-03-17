@@ -143,7 +143,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         if mana >= 40 {
             let firing = SKAction.animateWithTextures([
                 heroAtlas.textureNamed("mini_wizard_firing"),
-                heroAtlas.textureNamed("mini_wizard_firing")
+                heroAtlas.textureNamed("mini_wizard_firing"),
+                heroAtlas.textureNamed("10Xmini_wizard"),
+                heroAtlas.textureNamed("10Xmini_wizard"),
+                heroAtlas.textureNamed("10Xmini_wizard"),
+                heroAtlas.textureNamed("10Xmini_wizard")
                 ], timePerFrame: 0.12)
             
              let fire = SKAction.repeatAction(firing, count: 1)
@@ -249,6 +253,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         //calculates time in seconds
         calculateTime()
         
+        calcEnemy()
+        
     }
     
     //updates mana bar itself
@@ -271,7 +277,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             mana = 1
         }
         manaPercent = (mana/maxMana) * 100
-        
     }
     
     //function to calculate time in seconds
@@ -281,8 +286,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         if frames >= 30{
             frames = frames - 30
             time = time + 1
+        }
+    }
+    
+    func calcEnemy(){
+        var random: Int = Int(arc4random_uniform(100 - time))
+        
+        if(random == 1){
             spawnEnemy()
         }
+        
     }
     
 }

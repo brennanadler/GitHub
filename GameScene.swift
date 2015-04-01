@@ -24,11 +24,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     
     var time: Int!
     var frames: Int!
+    var timePassed: Int!
     
     override func didMoveToView(view: SKView)
     {
-        frames = 0
+        frames = 1
         time = 0
+        timePassed = 0
         
         // setup physics/gravity
         self.physicsWorld.gravity = CGVectorMake(0.0, -7)
@@ -142,8 +144,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     func fireBall(){
         if mana >= 40 {
             let firing = SKAction.animateWithTextures([
-                heroAtlas.textureNamed("mini_wizard_firing"),
-                heroAtlas.textureNamed("mini_wizard_firing"),
+                heroAtlas.textureNamed("10Xmini_wizard_firing"),
+                heroAtlas.textureNamed("10Xmini_wizard_firing"),
                 heroAtlas.textureNamed("10Xmini_wizard"),
                 heroAtlas.textureNamed("10Xmini_wizard"),
                 heroAtlas.textureNamed("10Xmini_wizard"),
@@ -165,7 +167,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     }
     
     func spawnEnemy(){
-        let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/3.5)
+        let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/3)
         let sprite = Enemy.createEnemy(endOfScreen)
         self.addChild(sprite)
     }
@@ -290,12 +292,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     }
     
     func calcEnemy(){
-        var random: Int = Int(arc4random_uniform(100 - time))
+        var randomnumber:Double = pow(1.01, Double(-frames+160)) + 20
+        var random = arc4random_uniform(50)
         
         if(random == 1){
             spawnEnemy()
         }
         
     }
+    
+    
     
 }

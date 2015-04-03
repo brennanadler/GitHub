@@ -20,6 +20,7 @@ class Enemy: SKSpriteNode {
             physics.mass = 0
             physics.restitution = 0
             physics.friction = 0
+            //Basically wind resistance, the default value was .1
             physics.linearDamping = 0
             //physics.usesPreciseCollisionDetection = false
             //physics.collisionBitMask = 0

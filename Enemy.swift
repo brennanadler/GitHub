@@ -16,7 +16,10 @@ class Enemy: SKSpriteNode {
         if let physics = sprite.physicsBody {
             physics.affectedByGravity = false
             physics.allowsRotation = false
-            physics.velocity = CGVectorMake(-300, 0)
+            
+            var random = arc4random_uniform(3)
+            var randomspeed:CGFloat = -1 * 100 * CGFloat(random) - 100
+            physics.velocity = CGVectorMake(randomspeed, 0)
             physics.mass = 0
             physics.restitution = 0
             physics.friction = 0

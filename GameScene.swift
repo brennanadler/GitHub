@@ -167,7 +167,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     }
     
     func spawnEnemy(){
-        let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/3)
+        let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/1.5)
         let sprite = Enemy.createEnemy(endOfScreen)
         self.addChild(sprite)
     }
@@ -292,8 +292,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     }
     
     func calcEnemy(){
-        var randomnumber:Double = pow(1.01, Double(-frames+160)) + 20
-        var random = arc4random_uniform(50)
+        var randomnumber:UInt32 = UInt32(pow(1.01, Double(-(time-450))))
+            
+        var randomnumbers:UInt32 = randomnumber + 20
+        print("random = \(randomnumbers)")
+        
+        var random = arc4random_uniform(randomnumbers)
         
         if(random == 1){
             spawnEnemy()

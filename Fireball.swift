@@ -12,7 +12,7 @@ class Fireball: SKSpriteNode {
         let spriteSize = CGSizeMake(sprite.size.width, sprite.size.height)
         let spriteCenter = CGPointMake(sprite.position.x/2, sprite.position.y/2)
         
-        sprite.physicsBody = SKPhysicsBody(rectangleOfSize: spriteSize, center: spriteCenter)
+        sprite.physicsBody = SKPhysicsBody(circleOfRadius: sprite.size.width/2)
         if let physics = sprite.physicsBody {
             physics.affectedByGravity = false
             physics.allowsRotation = false
@@ -22,14 +22,14 @@ class Fireball: SKSpriteNode {
         let fireball_anim = SKAction.animateWithTextures([
             heroAtlas.textureNamed("fireball1"),
             heroAtlas.textureNamed("fireball2")
-            ], timePerFrame: 0.06)
+            ], timePerFrame: 0.12)
         
         let run = SKAction.repeatActionForever(fireball_anim)
         
         sprite.runAction(run, withKey: "fire")
         
-        sprite.xScale = 2.0
-        sprite.yScale = 2.0
+        sprite.xScale = 3.0
+        sprite.yScale = 3.0
         
         return sprite
     }

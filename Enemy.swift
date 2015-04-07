@@ -9,17 +9,15 @@ class Enemy: SKSpriteNode {
         
         let sprite = Enemy(texture: heroAtlas.textureNamed("10XBat1"))
         sprite.position = location
-        let spriteSize = CGSizeMake(sprite.size.width/3, sprite.size.height/3)
+        let spriteSize = CGSizeMake(sprite.size.width, sprite.size.height)
         let spriteCenter = CGPointMake(sprite.position.x/2, sprite.position.y/2)
         
-        sprite.physicsBody = SKPhysicsBody(rectangleOfSize: spriteSize, center: spriteCenter)
+        sprite.physicsBody = SKPhysicsBody(circleOfRadius: sprite.size.width/3)
         if let physics = sprite.physicsBody {
             physics.affectedByGravity = false
             physics.allowsRotation = false
-            
-            var random = arc4random_uniform(3)
-            var randomspeed:CGFloat = -1 * 100 * CGFloat(random) - 100
-            physics.velocity = CGVectorMake(randomspeed, 0)
+
+            physics.velocity = CGVectorMake(-200, 0)
             physics.mass = 0
             physics.restitution = 0
             physics.friction = 0

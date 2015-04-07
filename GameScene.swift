@@ -47,18 +47,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         
         //initializes our hero and sets his initial texture to running1
         hero = SKSpriteNode(texture: heroAtlas.textureNamed("10Xmini_wizard"))
-        hero.xScale = 0.5
-        hero.yScale = 0.5
+        hero.xScale = 0.4
+        hero.yScale = 0.4
         hero.position = CGPointMake(frame.width / 4.0, frame.height / 4.0)
         
         //creates some CG values for the hero to be used in its physics definitions
         let heroSize = CGSizeMake(hero.size.width, hero.size.height)
         let heroCenter = CGPointMake(hero.position.x/2, hero.position.y/2)
         
-        hero.physicsBody = SKPhysicsBody(rectangleOfSize: heroSize, center: heroCenter)
+        hero.physicsBody = SKPhysicsBody(circleOfRadius: hero.size.width/2)
         hero.physicsBody?.dynamic = true
         hero.physicsBody?.mass = 4
         hero.physicsBody?.restitution = 0
+        hero.physicsBody?.allowsRotation = false
         
         //init Mana Color
         mana = 0
@@ -146,10 +147,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             let firing = SKAction.animateWithTextures([
                 heroAtlas.textureNamed("10Xmini_wizard_firing"),
                 heroAtlas.textureNamed("10Xmini_wizard_firing"),
-                heroAtlas.textureNamed("10Xmini_wizard"),
-                heroAtlas.textureNamed("10Xmini_wizard"),
-                heroAtlas.textureNamed("10Xmini_wizard"),
-                heroAtlas.textureNamed("10Xmini_wizard")
+                heroAtlas.textureNamed("10Xmini_wizard_firing"),
+                heroAtlas.textureNamed("10Xmini_wizard_firing")
                 ], timePerFrame: 0.12)
             
              let fire = SKAction.repeatAction(firing, count: 1)
@@ -167,7 +166,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     }
     
     func spawnEnemy(){
-        let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/1.5)
+        print(frame.height)
+        let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/1.75)
         let sprite = Enemy.createEnemy(endOfScreen)
         self.addChild(sprite)
     }
@@ -177,8 +177,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         jump = SKSpriteNode(texture: heroAtlas.textureNamed("jump_button"))
         jump.position = CGPointMake(frame.width / 1.1, frame.height / 3.75)
         jump.name = "jump"
-        jump.xScale = 0.3
-        jump.yScale = 0.3
+        jump.xScale = 0.5
+        jump.yScale = 0.5
         self.addChild(jump)
     }
     
@@ -292,9 +292,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     }
     
     func calcEnemy(){
-        var randomnumber:UInt32 = UInt32(pow(1.01, Double(-(time-450))))
+        var randomnumber:UInt32 = UInt32(pow(1.01, Double(-(time-200))))
             
-        var randomnumbers:UInt32 = randomnumber + 20
+        var randomnumbers:UInt32 = randomnumber + 100
         print("random = \(randomnumbers)")
         
         var random = arc4random_uniform(randomnumbers)

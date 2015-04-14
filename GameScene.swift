@@ -177,8 +177,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         jump = SKSpriteNode(texture: heroAtlas.textureNamed("jump_button"))
         jump.position = CGPointMake(frame.width / 1.1, frame.height / 3.75)
         jump.name = "jump"
-        jump.xScale = 0.5
-        jump.yScale = 0.5
+        jump.xScale = 0.3
+        jump.yScale = 0.3
         self.addChild(jump)
     }
     
@@ -304,7 +304,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         }
         
     }
-    
     
     
 }

@@ -26,8 +26,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     var frames: Int!
     var timePassed: Int!
     
+    enum ColliderType:UInt32 {
+        case hero = 1
+        case Enemy = 2
+        case Fireball = 3
+    }
+    
     override func didMoveToView(view: SKView)
     {
+        self.physicsWorld.contactDelegate = self
+        view.showsPhysics = true
+        
         frames = 1
         time = 0
         timePassed = 0
@@ -43,23 +52,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         addFireButton()
         addJumpButton()
         addManaOverlay()
+        addHero()
         
-        
-        //initializes our hero and sets his initial texture to running1
-        hero = SKSpriteNode(texture: heroAtlas.textureNamed("10Xmini_wizard"))
-        hero.xScale = 0.4
-        hero.yScale = 0.4
-        hero.position = CGPointMake(frame.width / 4.0, frame.height / 4.0)
-        
-        //creates some CG values for the hero to be used in its physics definitions
-        let heroSize = CGSizeMake(hero.size.width, hero.size.height)
-        let heroCenter = CGPointMake(hero.position.x/2, hero.position.y/2)
-        
-        hero.physicsBody = SKPhysicsBody(circleOfRadius: hero.size.width/2)
-        hero.physicsBody?.dynamic = true
-        hero.physicsBody?.mass = 4
-        hero.physicsBody?.restitution = 0
-        hero.physicsBody?.allowsRotation = false
         
         //init Mana Color
         mana = 0
@@ -142,6 +136,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         }
     }
     
+    func addHero(){
+        //initializes our hero and sets his initial texture to running1
+        hero = SKSpriteNode(texture: heroAtlas.textureNamed("10Xmini_wizard"))
+        hero.xScale = 0.4
+        hero.yScale = 0.4
+        hero.position = CGPointMake(frame.width / 4.0, frame.height / 4.0)
+        
+        //creates some CG values for the hero to be used in its physics definitions
+        let heroSize = CGSizeMake(hero.size.width, hero.size.height)
+        let heroCenter = CGPointMake(hero.position.x/2, hero.position.y/2)
+        
+        hero.physicsBody = SKPhysicsBody(circleOfRadius: hero.size.width/2)
+        hero.physicsBody?.dynamic = true
+        hero.physicsBody?.mass = 4
+        hero.physicsBody?.restitution = 0
+        hero.physicsBody?.allowsRotation = false
+        
+        hero.physicsBody!.categoryBitMask = ColliderType.hero.rawValue
+        hero.physicsBody!.contactTestBitMask = ColliderType.Enemy.rawValue
+        hero.physicsBody!.collisionBitMask = ColliderType.Enemy.rawValue
+    }
+    
     func fireBall(){
         if mana >= 40 {
             let firing = SKAction.animateWithTextures([
@@ -160,6 +176,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             }
             
             let sprite = Fireball.createFireBall(point)
+            sprite.physicsBody!.categoryBitMask = ColliderType.Fireball.rawValue
+            sprite.physicsBody!.contactTestBitMask = ColliderType.Enemy.rawValue
+            sprite.physicsBody!.collisionBitMask = ColliderType.Enemy.rawValue
             self.addChild(sprite)
             mana = mana - 40
         }
@@ -169,6 +188,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         print(frame.height)
         let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/1.75)
         let sprite = Enemy.createEnemy(endOfScreen)
+        
+        sprite.physicsBody!.categoryBitMask = ColliderType.Enemy.rawValue
+        sprite.physicsBody!.contactTestBitMask = ColliderType.hero.rawValue
+        sprite.physicsBody!.collisionBitMask = ColliderType.hero.rawValue
+        sprite.physicsBody!.contactTestBitMask = ColliderType.Fireball.rawValue
+        sprite.physicsBody!.collisionBitMask = ColliderType.Fireball.rawValue
+        
         self.addChild(sprite)
     }
     
@@ -304,6 +330,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         }
         
     }
+    
     
     
 }

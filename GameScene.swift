@@ -28,13 +28,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     
     enum ColliderType:UInt32 {
         case hero = 1
-        case Enemy = 2
-        case Fireball = 3
+        case enemy = 2
+        case fireball = 4
+        case ground = 8
     }
     
     override func didMoveToView(view: SKView)
     {
+        //sets physics collision delegator to this class
         self.physicsWorld.contactDelegate = self
+        //shows physics boundaries
         view.showsPhysics = true
         
         frames = 1
@@ -42,7 +45,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         timePassed = 0
         
         // setup physics/gravity
-        self.physicsWorld.gravity = CGVectorMake(0.0, -7)
+        self.physicsWorld.gravity = CGVectorMake(0.0, -10)
         
         TheGame = SKNode()
         self.addChild(TheGame)
@@ -53,20 +56,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         addJumpButton()
         addManaOverlay()
         addHero()
-        
-        
-        //init Mana Color
-        mana = 0
-        maxMana = 100
-        manaPercent = (mana/maxMana)*100
-        manaRegen = (10)
-        
-        manaWidth = manaPercent
-        manaSize = CGSize(width: manaWidth, height: 30)
-        manaBar = SKSpriteNode(color: UIColor(red: 20/255, green: 20/255, blue: 255/255, alpha: 1.0), size: manaSize)
-        self.addChild(manaBar)
-        
-        self.addChild(hero);
+        addManaBar()
         runForward()
     }
     
@@ -96,14 +86,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
@@ -124,6 +106,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
                             }
                             
                         }
+                            
                             //I have no idea why this doesn't work so I commented
                             //out the code that adds the button
                             // IT WORKS, #BrennanFixesAllOfSeansPoorCode
@@ -136,6 +119,33 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         }
     }
     
+    //this gets called automatically when 2 objects hit each other
+    func didBeginContact(contact: SKPhysicsContact)
+    {
+        //variable stores the two things contacting
+        let contactMask = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
+        
+        switch(contactMask){
+            
+        case ColliderType.hero.rawValue | ColliderType.enemy.rawValue:
+        println("U DEAD")
+        
+        case ColliderType.fireball.rawValue | ColliderType.enemy.rawValue:
+        println("BAT U DEAD")
+        
+        default:
+        return
+            
+            
+            
+        }
+    }
+    
+    //this gets called automatically when 2 objects stop hitting each other
+    func didEndContact(contact: SKPhysicsContact)
+    {
+        
+    }
     func addHero(){
         //initializes our hero and sets his initial texture to running1
         hero = SKSpriteNode(texture: heroAtlas.textureNamed("10Xmini_wizard"))
@@ -153,10 +163,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         hero.physicsBody?.restitution = 0
         hero.physicsBody?.allowsRotation = false
         
+        //Physics Collision stuff
         hero.physicsBody!.categoryBitMask = ColliderType.hero.rawValue
-        hero.physicsBody!.contactTestBitMask = ColliderType.Enemy.rawValue
-        hero.physicsBody!.collisionBitMask = ColliderType.Enemy.rawValue
+        hero.physicsBody!.contactTestBitMask = ColliderType.enemy.rawValue
+        hero.physicsBody!.collisionBitMask = ColliderType.enemy.rawValue
+        self.addChild(hero);
+        
     }
+    
+    func addManaBar(){
+        //init Mana Color
+        mana = 0
+        maxMana = 100
+        manaPercent = (mana/maxMana)*100
+        manaRegen = (10)
+        
+        manaWidth = manaPercent
+        manaSize = CGSize(width: manaWidth, height: 30)
+        manaBar = SKSpriteNode(color: UIColor(red: 20/255, green: 20/255, blue: 255/255, alpha: 1.0), size: manaSize)
+        self.addChild(manaBar)
+    }
+
     
     func fireBall(){
         if mana >= 40 {
@@ -172,28 +199,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             if (hero.actionForKey("firing") == nil)
             {
                 hero.runAction(fire, withKey: "jumping")
-                hero.physicsBody?.velocity = CGVectorMake(0, 0)
             }
             
+            //creates the Fireball itself
             let sprite = Fireball.createFireBall(point)
-            sprite.physicsBody!.categoryBitMask = ColliderType.Fireball.rawValue
-            sprite.physicsBody!.contactTestBitMask = ColliderType.Enemy.rawValue
-            sprite.physicsBody!.collisionBitMask = ColliderType.Enemy.rawValue
+            
+            //registers the fireball as something to pay attention to
+            sprite.physicsBody!.categoryBitMask = ColliderType.fireball.rawValue
+            
+            //tells the object what things it can bounce off of and so forth
+            sprite.physicsBody!.contactTestBitMask = ColliderType.fireball.rawValue
+            
+            //tells the object the we care when it hits this thing
+            sprite.physicsBody!.collisionBitMask = ColliderType.fireball.rawValue
             self.addChild(sprite)
             mana = mana - 40
         }
     }
     
     func spawnEnemy(){
-        print(frame.height)
+        //println(frame.height)
         let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/1.75)
         let sprite = Enemy.createEnemy(endOfScreen)
         
-        sprite.physicsBody!.categoryBitMask = ColliderType.Enemy.rawValue
-        sprite.physicsBody!.contactTestBitMask = ColliderType.hero.rawValue
-        sprite.physicsBody!.collisionBitMask = ColliderType.hero.rawValue
-        sprite.physicsBody!.contactTestBitMask = ColliderType.Fireball.rawValue
-        sprite.physicsBody!.collisionBitMask = ColliderType.Fireball.rawValue
+        sprite.physicsBody!.categoryBitMask = ColliderType.enemy.rawValue
+        sprite.physicsBody!.contactTestBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue
+        sprite.physicsBody!.collisionBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue
         
         self.addChild(sprite)
     }
@@ -321,7 +352,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         var randomnumber:UInt32 = UInt32(pow(1.01, Double(-(time-200))))
             
         var randomnumbers:UInt32 = randomnumber + 100
-        print("random = \(randomnumbers)")
+        //println("random = \(randomnumbers)")
         
         var random = arc4random_uniform(randomnumbers)
         

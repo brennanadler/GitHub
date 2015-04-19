@@ -1,10 +1,12 @@
 import SpriteKit
 
+
 class GameScene: SKScene, SKPhysicsContactDelegate
 {
     var TheGame: SKNode!
     
     let heroAtlas = SKTextureAtlas(named: "wizard.atlas")
+    var ScoreBoard: UITextField!
     
     //Init SpritekitNodes
     var hero: SKSpriteNode!
@@ -19,13 +21,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     var manaSize: CGSize!
     var manaWidth: CGFloat!
     
+    //Variables for fireball
     var fireBallPoint: CGPoint!
     var point: CGPoint!
     
+    
+    //Time Variables
     var time: Int!
     var frames: Int!
     var timePassed: Int!
     
+    
+    //Score Variables
+    var Score: Int!
+    var HighScore: Int!
+    var PastScore: Int!
+    
+    //Stores the values for collisions
     enum ColliderType:UInt32 {
         case hero = 1
         case enemy = 2
@@ -38,11 +50,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         //sets physics collision delegator to this class
         self.physicsWorld.contactDelegate = self
         //shows physics boundaries
-        view.showsPhysics = true
+        //view.showsPhysics = true
         
         frames = 1
         time = 0
         timePassed = 0
+        Score = 0
         
         // setup physics/gravity
         self.physicsWorld.gravity = CGVectorMake(0.0, -10)
@@ -58,11 +71,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         addHero()
         addManaBar()
         runForward()
+        
+        ScoreBoard = UITextField(frame: CGRect(x: 520, y: 26, width: 300, height: 20))
+        ScoreBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 1.0)
+        ScoreBoard.text = "Score: 0"
+        ScoreBoard.textColor = UIColor.blackColor()
+        view.addSubview(ScoreBoard)
     }
     
     override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
     {
-        
+    
         for touch: AnyObject in touches
         {
             
@@ -86,6 +105,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
                                 heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
@@ -102,7 +123,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
                             {
                                 hero.runAction(jump, withKey: "jumping")
                                 hero.physicsBody?.velocity = CGVectorMake(0, 0)
-                                hero.physicsBody?.applyImpulse(CGVectorMake(0, 3300))
+                                hero.physicsBody?.applyImpulse(CGVectorMake(0, 3750))
                             }
                             
                         }
@@ -130,7 +151,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         case ColliderType.hero.rawValue | ColliderType.enemy.rawValue:
         println("U DEAD")
         
+        // Configure the view.
+        let scene = MainMenu()
+        let skView = self.view as SKView!
+        skView.showsFPS = true
+        skView.showsNodeCount = true
+        
+        /* Sprite Kit applies additional optimizations to improve rendering performance */
+        skView.ignoresSiblingOrder = true
+        
+        /* Set the scale mode to scale to fit the window */
+        scene.scaleMode = .AspectFill
+        
+        skView.presentScene(scene)
+            
         case ColliderType.fireball.rawValue | ColliderType.enemy.rawValue:
+        contact.bodyA.node?.removeFromParent()
+        contact.bodyB.node?.removeFromParent()
         println("BAT U DEAD")
         
         default:
@@ -157,15 +194,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         let heroSize = CGSizeMake(hero.size.width, hero.size.height)
         let heroCenter = CGPointMake(hero.position.x/2, hero.position.y/2)
         
-        hero.physicsBody = SKPhysicsBody(circleOfRadius: hero.size.width/2)
+        hero.physicsBody = SKPhysicsBody(circleOfRadius: hero.size.width/2.5)
         hero.physicsBody?.dynamic = true
         hero.physicsBody?.mass = 4
         hero.physicsBody?.restitution = 0
         hero.physicsBody?.allowsRotation = false
         
         //Physics Collision stuff
+        //Tells the listener we care about this entity/stores its value
         hero.physicsBody!.categoryBitMask = ColliderType.hero.rawValue
+        
+        //what this can collide with
         hero.physicsBody!.contactTestBitMask = ColliderType.enemy.rawValue
+        
+        //Implements the listener
         hero.physicsBody!.collisionBitMask = ColliderType.enemy.rawValue
         self.addChild(hero);
         
@@ -192,7 +234,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
                 heroAtlas.textureNamed("10Xmini_wizard_firing"),
                 heroAtlas.textureNamed("10Xmini_wizard_firing"),
                 heroAtlas.textureNamed("10Xmini_wizard_firing")
-                ], timePerFrame: 0.12)
+                ], timePerFrame: 0.08)
             
              let fire = SKAction.repeatAction(firing, count: 1)
             
@@ -309,8 +351,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         //adds a frame before every frame to keep track of time
         frames = frames + 1
         
+        //updates ScoreBoard
+        ScoreBoard.text = "Score: \(Score)"
+        
         //calculates time in seconds
         calculateTime()
+        calculateScore()
         
         calcEnemy()
         
@@ -359,6 +405,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         if(random == 1){
             spawnEnemy()
         }
+        
+    }
+    
+    func calculateScore(){
+        
+        Score = Score + 1 + time
+        println(Score)
         
     }
     

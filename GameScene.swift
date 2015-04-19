@@ -151,6 +151,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         case ColliderType.hero.rawValue | ColliderType.enemy.rawValue:
         println("U DEAD")
         
+        //Removes Score display and records the earned score
+        PastScore = Score
+        ScoreBoard.removeFromSuperview()
+        
         // Configure the view.
         let scene = MainMenu()
         let skView = self.view as SKView!

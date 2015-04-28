@@ -8,8 +8,8 @@ class GameViewController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NSUserDefaults.standardUserDefaults().setObject("0", forKey: "HighScore") // we are saving a variable called myName and we are giving it the value of "Bob"
-        println(NSUserDefaults.standardUserDefaults().objectForKey("HighScore")!)
+        NSUserDefaults.standardUserDefaults().setInteger(0, forKey: "HighScore") // we are saving a variable called myName and we are giving it the value of "Bob"
+        println(NSUserDefaults.standardUserDefaults().integerForKey("HighScore")!)
         
         
         

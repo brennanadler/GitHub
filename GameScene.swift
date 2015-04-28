@@ -51,11 +51,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         self.physicsWorld.contactDelegate = self
         //shows physics boundaries
         //view.showsPhysics = true
-        
+        //NSNotificationCenter.defaultCenter().postNotificationName("hideadsID", object: nil)
         frames = 1
         time = 0
         timePassed = 0
         Score = 0
+        PastScore = 0
         
         // setup physics/gravity
         self.physicsWorld.gravity = CGVectorMake(0.0, -10)
@@ -149,7 +150,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         switch(contactMask){
             
         case ColliderType.hero.rawValue | ColliderType.enemy.rawValue:
-        println("U DEAD")
+        //println("U DEAD")
         
         //Removes Score display and records the earned score
         PastScore = Score
@@ -167,12 +168,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         /* Set the scale mode to scale to fit the window */
         scene.scaleMode = .AspectFill
         
+        scene.Game = true
         skView.presentScene(scene)
+        scene.addScoreBoard(PastScore)
             
         case ColliderType.fireball.rawValue | ColliderType.enemy.rawValue:
         contact.bodyA.node?.removeFromParent()
         contact.bodyB.node?.removeFromParent()
-        println("BAT U DEAD")
+       // println("BAT U DEAD")
         
         default:
         return
@@ -415,10 +418,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     func calculateScore(){
         
         Score = Score + 1 + time
-        println(Score)
+        //println(Score)
         
     }
     
+    func getPastScore() -> Int{
+        return PastScore
+    }
     
     
 }

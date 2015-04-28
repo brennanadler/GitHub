@@ -17,7 +17,7 @@ class Enemy: SKSpriteNode {
             physics.affectedByGravity = false
             physics.allowsRotation = false
 
-            physics.velocity = CGVectorMake(-200, 0)
+            physics.velocity = CGVectorMake(-300, 0)
             physics.mass = 0
             physics.restitution = 0
             physics.friction = 0

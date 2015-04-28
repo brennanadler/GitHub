@@ -17,7 +17,9 @@ class Fireball: SKSpriteNode {
             physics.affectedByGravity = false
             physics.allowsRotation = false
             physics.velocity = CGVectorMake(600, 0)
+
         }
+        
         
         let fireball_anim = SKAction.animateWithTextures([
             heroAtlas.textureNamed("fireball1"),

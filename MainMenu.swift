@@ -149,7 +149,7 @@ class MainMenu: SKScene
     ScoreBoard.textColor = UIColor.blackColor()
     self.view?.addSubview(ScoreBoard)
     
-        var preHScore: Int = NSUserDefaults.standardUserDefaults().integerForKey("HighScore")!
+        var preHScore: Int = NSUserDefaults.standardUserDefaults().integerForKey("HighScore")
         
         if(PScore >  preHScore){
             NSUserDefaults.standardUserDefaults().setObject(PScore, forKey: "HighScore")

@@ -168,9 +168,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         /* Set the scale mode to scale to fit the window */
         scene.scaleMode = .AspectFill
         
-        scene.Game = true
+        //updates the high score and also saves the previous score value in the class
+        scene.updateHScore(PastScore)
         skView.presentScene(scene)
-        scene.addScoreBoard(PastScore)
             
         case ColliderType.fireball.rawValue | ColliderType.enemy.rawValue:
         contact.bodyA.node?.removeFromParent()

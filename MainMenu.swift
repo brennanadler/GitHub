@@ -29,6 +29,9 @@ class MainMenu: SKScene
 {
     let heroAtlas = SKTextureAtlas(named: "wizard.atlas")
     var Screen: SKNode!
+    var Game = false
+    var ScoreBoard: UITextField!
+    
     
     override func didMoveToView(view: SKView)
     {
@@ -38,7 +41,7 @@ class MainMenu: SKScene
         addStartButton()
         addOptionButton()
         addStoreButton()
-        
+        //NSNotificationCenter.defaultCenter().postNotificationName("showadsID", object: nil)
     }
 
 
@@ -73,15 +76,21 @@ class MainMenu: SKScene
                                 skView.presentScene(scene)
                                 /* Set the scale mode to scale to fit the window */
                                 scene.scaleMode = .AspectFill
+                                
+                                if(Game){
+                                    ScoreBoard.removeFromSuperview()
+                                }
                             }
+                            
                         }else if(spriteNode.name == "OptionButton"){
                             
-                            let scene = OptionMenu()
-                            skView.presentScene(scene)
+                            let scenery = OptionMenu()
+                            skView.presentScene(scenery)
                             /* Set the scale mode to scale to fit the window */
-                            scene.scaleMode = .AspectFill
+                            scenery.scaleMode = .AspectFill
                             
                         }else if(spriteNode.name == "ShopButton"){
+                            
                             let scene = ShopMenu()
                             skView.presentScene(scene)
                             /* Set the scale mode to scale to fit the window */
@@ -110,7 +119,7 @@ class MainMenu: SKScene
         StartButton.name = "StartButton"
         StartButton.xScale = 0.0015
         StartButton.yScale = 0.0015
-        self.addChild(StartButton)
+        addChild(StartButton)
     }
     
     func addOptionButton(){
@@ -120,7 +129,7 @@ class MainMenu: SKScene
         OptionButton.name = "OptionButton"
         OptionButton.xScale = 0.0015
         OptionButton.yScale = 0.0015
-        self.addChild(OptionButton)
+        addChild(OptionButton)
     }
     
     func addStoreButton(){
@@ -130,7 +139,26 @@ class MainMenu: SKScene
         ShopButton.name = "ShopButton"
         ShopButton.xScale = 0.0015
         ShopButton.yScale = 0.0015
-        self.addChild(ShopButton)
+        addChild(ShopButton)
     }
+    
+    func addScoreBoard(PScore: Int){
+    ScoreBoard = UITextField(frame: CGRect(x: 520, y: 26, width: 300, height: 20))
+    ScoreBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 1.0)
+    ScoreBoard.text = "Previous: \(PScore)"
+    ScoreBoard.textColor = UIColor.blackColor()
+    self.view?.addSubview(ScoreBoard)
+    
+        var preHScore: NSString = NSUserDefaults.standardUserDefaults().stringForKey("HighScore")!
+        var preHScoreN: Int = preHScore.integerValue
+        
+        if(PScore >  preHScoreN){
+            NSUserDefaults.standardUserDefaults().setObject("\(PScore)", forKey: "HighScore")
+        }
+        
+        println("High Score \(preHScoreN)")
+    
+    }
+
 
 }

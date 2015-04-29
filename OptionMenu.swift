@@ -9,10 +9,21 @@
 import SpriteKit
 
 
-class OptionMenu: SKScene{
+class OptionMenu: SKScene
+{
+    var Screen: SKSpriteNode!
     
     override func didMoveToView(view: SKView)
     {
+        Screen = SKSpriteNode()
+        self.addChild(Screen)
+        addBg()
+    }
+    
+    func addBg(){
+        let MainMenu = SKSpriteNode(imageNamed: "MainMenu")
+        MainMenu.position = CGPointMake(frame.width / 2, frame.height / 2)
+        addChild(MainMenu)
         
     }
     

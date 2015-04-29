@@ -43,6 +43,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         case enemy = 2
         case fireball = 4
         case ground = 8
+        case side = 16
     }
     
     override func didMoveToView(view: SKView)
@@ -50,7 +51,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         //sets physics collision delegator to this class
         self.physicsWorld.contactDelegate = self
         //shows physics boundaries
-        //view.showsPhysics = true
+        view.showsPhysics = true
         //NSNotificationCenter.defaultCenter().postNotificationName("hideadsID", object: nil)
         frames = 1
         time = 0
@@ -72,6 +73,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         addHero()
         addManaBar()
         runForward()
+        addSideKiller()
         
         ScoreBoard = UITextField(frame: CGRect(x: 520, y: 26, width: 300, height: 20))
         ScoreBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 1.0)
@@ -150,8 +152,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         switch(contactMask){
             
         case ColliderType.hero.rawValue | ColliderType.enemy.rawValue:
-        //println("U DEAD")
-        
+
         //Removes Score display and records the earned score
         PastScore = Score
         ScoreBoard.removeFromSuperview()
@@ -167,6 +168,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         
         /* Set the scale mode to scale to fit the window */
         scene.scaleMode = .AspectFill
+        scene.size = skView.bounds.size
         
         //updates the high score and also saves the previous score value in the class
         scene.updateHScore(PastScore)
@@ -175,7 +177,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         case ColliderType.fireball.rawValue | ColliderType.enemy.rawValue:
         contact.bodyA.node?.removeFromParent()
         contact.bodyB.node?.removeFromParent()
-       // println("BAT U DEAD")
+            
+        case ColliderType.enemy.rawValue | ColliderType.side.rawValue:
+        contact.bodyB.node?.removeFromParent()
         
         default:
         return
@@ -201,7 +205,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         let heroSize = CGSizeMake(hero.size.width, hero.size.height)
         let heroCenter = CGPointMake(hero.position.x/2, hero.position.y/2)
         
-        hero.physicsBody = SKPhysicsBody(circleOfRadius: hero.size.width/2.5)
+        hero.physicsBody = SKPhysicsBody(circleOfRadius: hero.size.width/2.8)
         hero.physicsBody?.dynamic = true
         hero.physicsBody?.mass = 4
         hero.physicsBody?.restitution = 0
@@ -266,16 +270,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         }
     }
     
-    func spawnEnemy(){
-        //println(frame.height)
-        let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/1.75)
-        let sprite = Enemy.createEnemy(endOfScreen)
+    func spawnEnemy(type: String){
+       
+        //spawns air unit
+        if(type == "air"){
+            let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/1.75)
+            let sprite = Enemy.createEnemy(endOfScreen)
+            
+            sprite.physicsBody!.categoryBitMask = ColliderType.enemy.rawValue
+            sprite.physicsBody!.contactTestBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue    | ColliderType.side.rawValue
+            sprite.physicsBody!.collisionBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue | ColliderType.side.rawValue
+            
+            self.addChild(sprite)
         
-        sprite.physicsBody!.categoryBitMask = ColliderType.enemy.rawValue
-        sprite.physicsBody!.contactTestBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue
-        sprite.physicsBody!.collisionBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue
-        
-        self.addChild(sprite)
+            // spawns ground unit
+        }else if(type == "ground"){
+            
+            let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/2.5)
+            let sprite = Enemy.createEnemy(endOfScreen)
+            
+            sprite.physicsBody!.categoryBitMask = ColliderType.enemy.rawValue
+            sprite.physicsBody!.contactTestBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue    | ColliderType.side.rawValue
+            sprite.physicsBody!.collisionBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue | ColliderType.side.rawValue
+            
+            self.addChild(sprite)
+        }
+
     }
     
     func addJumpButton(){
@@ -363,7 +383,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         
         //calculates time in seconds
         calculateTime()
-        calculateScore()
+        
+        Score = Score + 1 + time
         
         calcEnemy()
         
@@ -402,29 +423,39 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     }
     
     func calcEnemy(){
+        
         var randomnumber:UInt32 = UInt32(pow(1.01, Double(-(time-200))))
             
-        var randomnumbers:UInt32 = randomnumber + 100
-        //println("random = \(randomnumbers)")
+        var randomnumbers:UInt32 = 2 * (randomnumber + 100)
         
         var random = arc4random_uniform(randomnumbers)
         
         if(random == 1){
-            spawnEnemy()
+            spawnEnemy("air")
+        }
+        if(random == 2){
+            spawnEnemy("ground")
         }
         
     }
-    
-    func calculateScore(){
+
+    //Makes a Node on the left side of the screen that will kill all bats once the hit the edge of the screen so to reduce lag
+    func addSideKiller(){
         
-        Score = Score + 1 + time
-        //println(Score)
+        
+        let endOfScreenLeft:CGPoint = CGPointMake(0, frame.height/2)
+        let sizer: CGSize = CGSizeMake(CGFloat(10), CGFloat(1000))
+        
+        let side:SKNode = SKNode()
+        side.physicsBody = SKPhysicsBody(rectangleOfSize: sizer, center: endOfScreenLeft)
+        side.physicsBody!.dynamic = false
+        side.physicsBody!.categoryBitMask = ColliderType.side.rawValue
+        side.physicsBody!.contactTestBitMask = ColliderType.enemy.rawValue
+        side.physicsBody!.collisionBitMask = ColliderType.enemy.rawValue
+        self.addChild(side)
         
     }
-    
-    func getPastScore() -> Int{
-        return PastScore
-    }
+
     
     
 }

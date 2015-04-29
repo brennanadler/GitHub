@@ -6,7 +6,6 @@
 //  Copyright (c) 2015 Brennan Adler. All rights reserved.
 //
 
-import Foundation
 import SpriteKit
 
 extension SKNode {
@@ -28,15 +27,16 @@ extension SKNode {
 class MainMenu: SKScene
 {
     let heroAtlas = SKTextureAtlas(named: "wizard.atlas")
-    var Screen: SKNode!
+    var Screen: SKSpriteNode!
     var ScoreBoarder: UITextField!
     var HighScoreBoard: UITextField!
     var PreviousScore: Int!
+    var Game = false
     
     
     override func didMoveToView(view: SKView)
     {
-        Screen = SKNode()
+        Screen = SKSpriteNode()
         self.addChild(Screen)
         addBackground()
         addStartButton()
@@ -66,40 +66,47 @@ class MainMenu: SKScene
                         let skView = self.view as SKView!
                         skView.showsFPS = true
                         skView.showsNodeCount = true
-                        
-                        /* Sprite Kit applies additional optimizations to improve rendering performance */
-                        skView.ignoresSiblingOrder = true
-                        
                         if spriteNode.name == "StartButton"
                         {
+            
+                            
+                            /* Sprite Kit applies additional optimizations to improve rendering performance */
+                            
+                            //sets ignoreSiblingOrder to false the first game because of XCode Glitch where background was rendering over player for some reason
+                            skView.ignoresSiblingOrder = false
+                            if(Game){
+                                skView.ignoresSiblingOrder = true
+                            }
                             
                             if let scene = GameScene.unarchiveFromFile("GameScene") as? GameScene
                             {
                                 skView.presentScene(scene)
                                 /* Set the scale mode to scale to fit the window */
                                 scene.scaleMode = .AspectFill
-                                
-                                ScoreBoarder.removeFromSuperview()
-                                HighScoreBoard.removeFromSuperview()
-                            
-                            
+
                             }
                             
                         }else if(spriteNode.name == "OptionButton"){
                             
                             let scenery = OptionMenu()
+                            scenery.scaleMode = .AspectFill
+                            scenery.size = skView.bounds.size
                             skView.presentScene(scenery)
                             /* Set the scale mode to scale to fit the window */
-                            scenery.scaleMode = .AspectFill
+
                             
                         }else if(spriteNode.name == "ShopButton"){
                             
                             let scene = ShopMenu()
+                            scene.scaleMode = .AspectFill
+                            scene.size = skView.bounds.size
                             skView.presentScene(scene)
                             /* Set the scale mode to scale to fit the window */
-                            scene.scaleMode = .AspectFill
                             
                         }
+                        
+                        ScoreBoarder.removeFromSuperview()
+                        HighScoreBoard.removeFromSuperview()
                         
                     }
                 }
@@ -109,8 +116,6 @@ class MainMenu: SKScene
     
     func addBackground(){
         let MainMenu = SKSpriteNode(imageNamed: "MainMenu")
-        MainMenu.xScale = 0.0015
-        MainMenu.yScale = 0.0015
         MainMenu.position = CGPointMake(frame.width / 2, frame.height / 2)
         addChild(MainMenu)
     }
@@ -120,34 +125,30 @@ class MainMenu: SKScene
         StartButton = SKSpriteNode(texture: heroAtlas.textureNamed("Start"))
         StartButton.position = CGPointMake(frame.width / 2, frame.height / 2.4)
         StartButton.name = "StartButton"
-        StartButton.xScale = 0.0015
-        StartButton.yScale = 0.0015
         addChild(StartButton)
     }
     
     func addOptionButton(){
         var OptionButton: SKSpriteNode!
         OptionButton = SKSpriteNode(texture: heroAtlas.textureNamed("Start"))
-        OptionButton.position = CGPointMake(frame.width / 2, frame.height / 2.85)
+        OptionButton.position = CGPointMake(frame.width / 2, frame.height / 3.44)
         OptionButton.name = "OptionButton"
-        OptionButton.xScale = 0.0015
-        OptionButton.yScale = 0.0015
         addChild(OptionButton)
     }
     
     func addStoreButton(){
         var ShopButton: SKSpriteNode!
         ShopButton = SKSpriteNode(texture: heroAtlas.textureNamed("Start"))
-        ShopButton.position = CGPointMake(frame.width / 2, frame.height / 3.5)
+        ShopButton.position = CGPointMake(frame.width / 2, frame.height / 6)
         ShopButton.name = "ShopButton"
-        ShopButton.xScale = 0.0015
-        ShopButton.yScale = 0.0015
         addChild(ShopButton)
     }
     func addHighScore(){
         
         HighScoreBoard = UITextField(frame: CGRect(x: 16, y: 26, width: 300, height: 20))
         HighScoreBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
+        
+        //this variable draws from the permanent value created earlier for Highscore
         var HScore: Int = NSUserDefaults.standardUserDefaults().integerForKey("HighScore")
         HighScoreBoard.text = "High Score: \(HScore)"
         HighScoreBoard.textColor = UIColor.blackColor()
@@ -167,11 +168,15 @@ class MainMenu: SKScene
     
     func updateHScore(PScore:Int){
         PreviousScore = PScore
+        Game = true
+        
+        //takes previous HighScore Value and compares it to the previous score to see if a new highscore was set
         var preHScore: Int = NSUserDefaults.standardUserDefaults().integerForKey("HighScore")
         if(PScore >  preHScore){
-            NSUserDefaults.standardUserDefaults().setObject(PScore, forKey: "HighScore")
-            println(PScore)
             
+            //sets new highscore value
+            NSUserDefaults.standardUserDefaults().setObject(PScore, forKey: "HighScore")
+
         }
     }
     

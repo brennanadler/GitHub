@@ -12,6 +12,8 @@ import SpriteKit
 class OptionMenu: SKScene
 {
     var Screen: SKSpriteNode!
+    let xScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("xScale"))
+    let yScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("yScale"))
     
     override func didMoveToView(view: SKView)
     {

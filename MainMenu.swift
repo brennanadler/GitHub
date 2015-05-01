@@ -32,6 +32,8 @@ class MainMenu: SKScene
     var HighScoreBoard: UITextField!
     var PreviousScore: Int!
     var Game = false
+    let xScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("xScale"))
+    let yScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("yScale"))
     
     
     override func didMoveToView(view: SKView)
@@ -44,6 +46,7 @@ class MainMenu: SKScene
         addStoreButton()
         addHighScore()
         addScoreBoard()
+
     }
     
     
@@ -117,6 +120,8 @@ class MainMenu: SKScene
     func addBackground(){
         let MainMenu = SKSpriteNode(imageNamed: "MainMenu")
         MainMenu.position = CGPointMake(frame.width / 2, frame.height / 2)
+        MainMenu.xScale = xScaler
+        MainMenu.yScale = yScaler
         addChild(MainMenu)
     }
     
@@ -125,6 +130,8 @@ class MainMenu: SKScene
         StartButton = SKSpriteNode(texture: heroAtlas.textureNamed("Start"))
         StartButton.position = CGPointMake(frame.width / 2, frame.height / 2.4)
         StartButton.name = "StartButton"
+        StartButton.xScale = xScaler
+        StartButton.yScale = yScaler
         addChild(StartButton)
     }
     
@@ -133,6 +140,8 @@ class MainMenu: SKScene
         OptionButton = SKSpriteNode(texture: heroAtlas.textureNamed("Start"))
         OptionButton.position = CGPointMake(frame.width / 2, frame.height / 3.44)
         OptionButton.name = "OptionButton"
+        OptionButton.xScale = xScaler
+        OptionButton.yScale = yScaler
         addChild(OptionButton)
     }
     
@@ -141,6 +150,8 @@ class MainMenu: SKScene
         ShopButton = SKSpriteNode(texture: heroAtlas.textureNamed("Start"))
         ShopButton.position = CGPointMake(frame.width / 2, frame.height / 6)
         ShopButton.name = "ShopButton"
+        ShopButton.xScale = xScaler
+        ShopButton.yScale = yScaler
         addChild(ShopButton)
     }
     func addHighScore(){
@@ -178,6 +189,10 @@ class MainMenu: SKScene
             NSUserDefaults.standardUserDefaults().setObject(PScore, forKey: "HighScore")
 
         }
+        var Coin:Int = NSUserDefaults.standardUserDefaults().integerForKey("Coins")
+        Coin = Coin + Int(PScore/1000)
+        NSUserDefaults.standardUserDefaults().setInteger(Coin, forKey: "Coins")
+        println(Coin)
     }
     
     

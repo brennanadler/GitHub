@@ -37,6 +37,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     var HighScore: Int!
     var PastScore: Int!
     
+    //Scaler variables based on device dimensions
+    let xScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("xScale"))
+    let yScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("yScale"))
+    
     //Stores the values for collisions
     enum ColliderType:UInt32 {
         case hero = 1
@@ -48,6 +52,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     
     override func didMoveToView(view: SKView)
     {
+
         //sets physics collision delegator to this class
         self.physicsWorld.contactDelegate = self
         //shows physics boundaries
@@ -70,12 +75,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         addFireButton()
         addJumpButton()
         addManaOverlay()
-        addHero()
+        addHero(view)
         addManaBar()
         runForward()
         addSideKiller()
         
-        ScoreBoard = UITextField(frame: CGRect(x: 520, y: 26, width: 300, height: 20))
+        println("Frame width \(frame.width) and Bounds\(view.bounds.width)")
+        
+        ScoreBoard = UITextField(frame: CGRect(x: view.bounds.width/1.35, y: 26, width: 300, height: 20))
         ScoreBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 1.0)
         ScoreBoard.text = "Score: 0"
         ScoreBoard.textColor = UIColor.blackColor()
@@ -84,7 +91,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     
     override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
     {
-    
+        
         for touch: AnyObject in touches
         {
             
@@ -152,37 +159,37 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         switch(contactMask){
             
         case ColliderType.hero.rawValue | ColliderType.enemy.rawValue:
-
-        //Removes Score display and records the earned score
-        PastScore = Score
-        ScoreBoard.removeFromSuperview()
-        
-        // Configure the view.
-        let scene = MainMenu()
-        let skView = self.view as SKView!
-        skView.showsFPS = true
-        skView.showsNodeCount = true
-        
-        /* Sprite Kit applies additional optimizations to improve rendering performance */
-        skView.ignoresSiblingOrder = true
-        
-        /* Set the scale mode to scale to fit the window */
-        scene.scaleMode = .AspectFill
-        scene.size = skView.bounds.size
-        
-        //updates the high score and also saves the previous score value in the class
-        scene.updateHScore(PastScore)
-        skView.presentScene(scene)
+            
+            //Removes Score display and records the earned score
+            PastScore = Score
+            ScoreBoard.removeFromSuperview()
+            
+            // Configure the view.
+            let scene = MainMenu()
+            let skView = self.view as SKView!
+            skView.showsFPS = true
+            skView.showsNodeCount = true
+            
+            /* Sprite Kit applies additional optimizations to improve rendering performance */
+            skView.ignoresSiblingOrder = true
+            
+            /* Set the scale mode to scale to fit the window */
+            scene.scaleMode = .AspectFill
+            scene.size = skView.bounds.size
+            
+            //updates the high score and also saves the previous score value in the class
+            scene.updateHScore(PastScore)
+            skView.presentScene(scene)
             
         case ColliderType.fireball.rawValue | ColliderType.enemy.rawValue:
-        contact.bodyA.node?.removeFromParent()
-        contact.bodyB.node?.removeFromParent()
+            contact.bodyA.node?.removeFromParent()
+            contact.bodyB.node?.removeFromParent()
             
         case ColliderType.enemy.rawValue | ColliderType.side.rawValue:
-        contact.bodyB.node?.removeFromParent()
-        
+            contact.bodyB.node?.removeFromParent()
+            
         default:
-        return
+            return
             
             
             
@@ -194,7 +201,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     {
         
     }
-    func addHero(){
+    func addHero(view: SKView){
         //initializes our hero and sets his initial texture to running1
         hero = SKSpriteNode(texture: heroAtlas.textureNamed("10Xmini_wizard"))
         hero.xScale = 0.4
@@ -205,7 +212,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         let heroSize = CGSizeMake(hero.size.width, hero.size.height)
         let heroCenter = CGPointMake(hero.position.x/2, hero.position.y/2)
         
-        hero.physicsBody = SKPhysicsBody(circleOfRadius: hero.size.width/2.8)
+        hero.physicsBody = SKPhysicsBody(circleOfRadius: hero.size.width/2.6)
         hero.physicsBody?.dynamic = true
         hero.physicsBody?.mass = 4
         hero.physicsBody?.restitution = 0
@@ -236,7 +243,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         manaBar = SKSpriteNode(color: UIColor(red: 20/255, green: 20/255, blue: 255/255, alpha: 1.0), size: manaSize)
         self.addChild(manaBar)
     }
-
+    
     
     func fireBall(){
         if mana >= 40 {
@@ -247,7 +254,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
                 heroAtlas.textureNamed("10Xmini_wizard_firing")
                 ], timePerFrame: 0.08)
             
-             let fire = SKAction.repeatAction(firing, count: 1)
+            let fire = SKAction.repeatAction(firing, count: 1)
             
             if (hero.actionForKey("firing") == nil)
             {
@@ -271,7 +278,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     }
     
     func spawnEnemy(type: String){
-       
+        
         //spawns air unit
         if(type == "air"){
             let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/1.75)
@@ -282,7 +289,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             sprite.physicsBody!.collisionBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue | ColliderType.side.rawValue
             
             self.addChild(sprite)
-        
+            
             // spawns ground unit
         }else if(type == "ground"){
             
@@ -295,7 +302,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             
             self.addChild(sprite)
         }
-
+        
     }
     
     func addJumpButton(){
@@ -303,8 +310,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         jump = SKSpriteNode(texture: heroAtlas.textureNamed("jump_button"))
         jump.position = CGPointMake(frame.width / 1.1, frame.height / 3.75)
         jump.name = "jump"
-        jump.xScale = 0.3
-        jump.yScale = 0.3
+        jump.xScale = 0.3 * xScaler
+        jump.yScale = 0.3 * yScaler
         self.addChild(jump)
     }
     
@@ -313,8 +320,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         fire = SKSpriteNode(texture: heroAtlas.textureNamed("fire_button"))
         fire.name = "fire"
         fire.position = CGPointMake(frame.width / 10.0, frame.height / 3.75)
-        fire.xScale = 0.3
-        fire.yScale = 0.3
+        fire.xScale = 0.3 * xScaler
+        fire.yScale = 0.3 * yScaler
         self.addChild(fire)
     }
     
@@ -423,22 +430,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     }
     
     func calcEnemy(){
-        
         var randomnumber:UInt32 = UInt32(pow(1.01, Double(-(time-200))))
-            
+        
         var randomnumbers:UInt32 = 2 * (randomnumber + 100)
         
         var random = arc4random_uniform(randomnumbers)
         
         if(random == 1){
             spawnEnemy("air")
-        }
-        if(random == 2){
+        }else if(random == 2){
             spawnEnemy("ground")
         }
-        
     }
-
+    
     //Makes a Node on the left side of the screen that will kill all bats once the hit the edge of the screen so to reduce lag
     func addSideKiller(){
         
@@ -455,7 +459,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         self.addChild(side)
         
     }
-
+    
     
     
 }

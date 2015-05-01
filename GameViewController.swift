@@ -8,14 +8,23 @@ class GameViewController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NSUserDefaults.standardUserDefaults().setInteger(0, forKey: "HighScore") // we are saving a variable called myName and we are giving it the value of "Bob"
-        println(NSUserDefaults.standardUserDefaults().integerForKey("HighScore"))
+        //finds dimensions of screen (ipad vs iphone etc.)
+        var bounds: CGRect = UIScreen.mainScreen().bounds
+        var width:CGFloat = bounds.size.width
+        var height:CGFloat = bounds.size.height
+        
+        //Makes a global variable to store the Scale variables (Default is iPhone6)
+        NSUserDefaults.standardUserDefaults().setFloat(Float(width / 667), forKey: "xScale")
+        NSUserDefaults.standardUserDefaults().setFloat(Float(height / 375), forKey: "yScale")
+        println("width: \(width), height: \(height)")
+        println("xScaler, yScaler \(width/667) ,\(height/375)")
+        
+        //creates permanent Integer named "HighScore" that is an integer... Default value 0
+        NSUserDefaults.standardUserDefaults().setInteger(0, forKey: "HighScore")
+        NSUserDefaults.standardUserDefaults().setInteger(50, forKey: "Coins")
         
         
-        
-        
-        
-        
+        //Notification that will run the func hideBannerAd() and has name of hideadsID
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "hideBannerAd", name: "hideadsID", object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "showBannerAd", name: "showadsID", object: nil)
         
@@ -30,6 +39,7 @@ class GameViewController: UIViewController{
         
         /* Set the scale mode to scale to fit the window */
         scene.scaleMode = .AspectFill
+        scene.size = skView.bounds.size
         
         skView.presentScene(scene)
         

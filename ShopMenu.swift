@@ -16,6 +16,11 @@ class ShopMenu: SKScene
     var ShopButton2: SKSpriteNode!
     var ShopButton3: SKSpriteNode!
     var ExitButton1: SKSpriteNode!
+    
+    //variables for the gem counter at the bottom
+    var gem: SKSpriteNode!
+    var GemBoard: UITextField!
+    
     let heroAtlas = SKTextureAtlas(named: "wizard.atlas")
     let xScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("xScale"))
     let yScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("yScale"))
@@ -56,6 +61,19 @@ class ShopMenu: SKScene
         ExitButton1.xScale = 0.1 * xScaler
         ExitButton1.yScale = 0.1 * yScaler
         Screen.addChild(ExitButton1)
+        
+        gem = SKSpriteNode(texture: heroAtlas.textureNamed("Gem"))
+        gem.position = CGPointMake(view.bounds.width * (1/30), view.bounds.height/16)
+        gem.xScale = xScaler
+        gem.yScale = yScaler
+        Screen.addChild(gem)
+        
+        GemBoard = UITextField(frame: CGRect(x: view.bounds.width / 15, y: view.bounds.height * (59/64), width: 300, height: 20))
+        GemBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
+        GemBoard.textColor = UIColor.greenColor()
+        let Gemcount = NSUserDefaults.standardUserDefaults().integerForKey("Gems")
+        GemBoard.text = "\(Gemcount)"
+        view.addSubview(GemBoard)
     }
     
     override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)

@@ -15,6 +15,7 @@ class ShopMenu: SKScene
     var ShopButton1: SKSpriteNode!
     var ShopButton2: SKSpriteNode!
     var ShopButton3: SKSpriteNode!
+    var ExitButton1: SKSpriteNode!
     let heroAtlas = SKTextureAtlas(named: "wizard.atlas")
     let xScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("xScale"))
     let yScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("yScale"))
@@ -48,9 +49,16 @@ class ShopMenu: SKScene
         ShopButton3.xScale = xScaler
         ShopButton3.yScale = yScaler
         Screen.addChild(ShopButton3)
+        
+        ExitButton1 = SKSpriteNode( texture: heroAtlas.textureNamed("fire_button"))
+        ExitButton1.position = CGPointMake(view.bounds.width * (22/23), view.bounds.height * (19/20))
+        ExitButton1.name = "ExitButton1"
+        ExitButton1.xScale = 0.1 * xScaler
+        ExitButton1.yScale = 0.1 * yScaler
+        Screen.addChild(ExitButton1)
     }
     
-    override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
+    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)
     {
         
         for touch: AnyObject in touches
@@ -74,18 +82,43 @@ class ShopMenu: SKScene
                         }else if spriteNode.name == "ShopButton3"
                         {
                             deleteButtons()
+                        }else if spriteNode.name == "ExitButton1"
+                        {
+                            returntoMain()
                         }
+                        
                     }
                 }
             }
         }
     }
-
+    
     func deleteButtons(){
         ShopButton1.removeFromParent()
         ShopButton2.removeFromParent()
         ShopButton3.removeFromParent()
     }
+    
+    func returntoMain(){
+        let scene = GameScene()
+        // Configure the view.
+        let skView = self.view as SKView!
+        skView.showsFPS = true
+        skView.showsNodeCount = true
+        
+        /* Sprite Kit applies additional optimizations to improve rendering performance */
+        skView.ignoresSiblingOrder = true
+        
+        /* Set the scale mode to scale to fit the window */
+        scene.scaleMode = .AspectFill
+        scene.size = skView.bounds.size
+        println("This")
+        
+        skView.presentScene(scene)
+        
+
+    }
+    
     
     
     

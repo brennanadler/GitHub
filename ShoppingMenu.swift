@@ -9,7 +9,7 @@
 import SpriteKit
 
 
-class ShopMenu: SKScene
+class ShoppingMenu: SKScene
 {
     var Screen: SKSpriteNode!
     var ShopButton1: SKSpriteNode!
@@ -30,6 +30,7 @@ class ShopMenu: SKScene
         Screen = SKSpriteNode()
         self.addChild(Screen)
         addBg(view)
+        NSNotificationCenter.defaultCenter().postNotificationName("loadadsID", object: nil)
     }
     
     func addBg(view: SKView){
@@ -55,11 +56,11 @@ class ShopMenu: SKScene
         ShopButton3.yScale = yScaler
         Screen.addChild(ShopButton3)
         
-        ExitButton1 = SKSpriteNode( texture: heroAtlas.textureNamed("fire_button"))
+        ExitButton1 = SKSpriteNode(texture: heroAtlas.textureNamed("ExitButton"))
         ExitButton1.position = CGPointMake(view.bounds.width * (22/23), view.bounds.height * (19/20))
         ExitButton1.name = "ExitButton1"
-        ExitButton1.xScale = 0.1 * xScaler
-        ExitButton1.yScale = 0.1 * yScaler
+        ExitButton1.xScale = xScaler
+        ExitButton1.yScale = xScaler
         Screen.addChild(ExitButton1)
         
         gem = SKSpriteNode(texture: heroAtlas.textureNamed("Gem"))
@@ -76,7 +77,7 @@ class ShopMenu: SKScene
         view.addSubview(GemBoard)
     }
     
-    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)
+    override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
     {
         
         for touch: AnyObject in touches
@@ -102,6 +103,7 @@ class ShopMenu: SKScene
                             deleteButtons()
                         }else if spriteNode.name == "ExitButton1"
                         {
+                            println("exit")
                             returntoMain()
                         }
                         
@@ -115,26 +117,26 @@ class ShopMenu: SKScene
         ShopButton1.removeFromParent()
         ShopButton2.removeFromParent()
         ShopButton3.removeFromParent()
+        
     }
     
     func returntoMain(){
-        let scene = GameScene()
         // Configure the view.
-        let skView = self.view as SKView!
-        skView.showsFPS = true
-        skView.showsNodeCount = true
+        let scene = MainMenu()
+        let viewer = self.view as SKView!
+        viewer.showsFPS = true
+        viewer.showsNodeCount = true
         
         /* Sprite Kit applies additional optimizations to improve rendering performance */
-        skView.ignoresSiblingOrder = true
+        viewer.ignoresSiblingOrder = true
         
         /* Set the scale mode to scale to fit the window */
         scene.scaleMode = .AspectFill
-        scene.size = skView.bounds.size
-        println("This")
+        scene.size = viewer.bounds.size
         
-        skView.presentScene(scene)
+        viewer.presentScene(scene)
         
-
+        
     }
     
     

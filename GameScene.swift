@@ -10,6 +10,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     
     //Init SpritekitNodes
     var hero: SKSpriteNode!
+    var SkinSuffix = NSUserDefaults.standardUserDefaults().stringForKey("SkinSuffix")!
     var manaOver: SKSpriteNode!
     var manaBar: SKSpriteNode!
     
@@ -52,12 +53,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     
     override func didMoveToView(view: SKView)
     {
-
+        
         //sets physics collision delegator to this class
         self.physicsWorld.contactDelegate = self
-        //shows physics boundaries
-        view.showsPhysics = true
-        //NSNotificationCenter.defaultCenter().postNotificationName("hideadsID", object: nil)
+
         frames = 1
         time = 0
         timePassed = 0
@@ -79,8 +78,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         addManaBar()
         runForward()
         addSideKiller()
-        
-        println("Frame width \(frame.width) and Bounds\(view.bounds.width)")
         
         ScoreBoard = UITextField(frame: CGRect(x: view.bounds.width/1.35, y: 26, width: 300, height: 20))
         ScoreBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 1.0)
@@ -105,25 +102,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate
                             
                             // Do jump
                             let jumping = SKAction.animateWithTextures([
-                                heroAtlas.textureNamed("10Xmini_wizard_running1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2")
+                                heroAtlas.textureNamed("10Xmini_wizard_running1\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)"),
+                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)")
                                 ], timePerFrame: 0.06)
                             
                             let jump = SKAction.repeatAction(jumping, count: 1)
@@ -203,7 +200,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     }
     func addHero(view: SKView){
         //initializes our hero and sets his initial texture to running1
-        hero = SKSpriteNode(texture: heroAtlas.textureNamed("10Xmini_wizard"))
+        hero = SKSpriteNode(texture: heroAtlas.textureNamed("10Xmini_wizard\(SkinSuffix)"))
         hero.xScale = 0.4
         hero.yScale = 0.4
         hero.position = CGPointMake(frame.width / 4.0, frame.height / 4.0)
@@ -217,6 +214,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         hero.physicsBody?.mass = 4
         hero.physicsBody?.restitution = 0
         hero.physicsBody?.allowsRotation = false
+        
+        hero.zPosition = 5
         
         //Physics Collision stuff
         //Tells the listener we care about this entity/stores its value
@@ -241,6 +240,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         manaWidth = manaPercent
         manaSize = CGSize(width: manaWidth, height: 30)
         manaBar = SKSpriteNode(color: UIColor(red: 20/255, green: 20/255, blue: 255/255, alpha: 1.0), size: manaSize)
+        manaBar.zPosition = 5
         self.addChild(manaBar)
     }
     
@@ -248,10 +248,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     func fireBall(){
         if mana >= 40 {
             let firing = SKAction.animateWithTextures([
-                heroAtlas.textureNamed("10Xmini_wizard_firing"),
-                heroAtlas.textureNamed("10Xmini_wizard_firing"),
-                heroAtlas.textureNamed("10Xmini_wizard_firing"),
-                heroAtlas.textureNamed("10Xmini_wizard_firing")
+                heroAtlas.textureNamed("10Xmini_wizard_firing\(SkinSuffix)"),
+                heroAtlas.textureNamed("10Xmini_wizard_firing\(SkinSuffix)"),
+                heroAtlas.textureNamed("10Xmini_wizard_firing\(SkinSuffix)"),
+                heroAtlas.textureNamed("10Xmini_wizard_firing\(SkinSuffix)")
                 ], timePerFrame: 0.08)
             
             let fire = SKAction.repeatAction(firing, count: 1)
@@ -272,6 +272,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             
             //tells the object the we care when it hits this thing
             sprite.physicsBody!.collisionBitMask = ColliderType.fireball.rawValue
+            
+            sprite.zPosition = 3
             self.addChild(sprite)
             mana = mana - 40
         }
@@ -287,7 +289,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             sprite.physicsBody!.categoryBitMask = ColliderType.enemy.rawValue
             sprite.physicsBody!.contactTestBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue    | ColliderType.side.rawValue
             sprite.physicsBody!.collisionBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue | ColliderType.side.rawValue
-            
+            sprite.zPosition = 5
             self.addChild(sprite)
             
             // spawns ground unit
@@ -299,7 +301,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             sprite.physicsBody!.categoryBitMask = ColliderType.enemy.rawValue
             sprite.physicsBody!.contactTestBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue    | ColliderType.side.rawValue
             sprite.physicsBody!.collisionBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue | ColliderType.side.rawValue
-            
+            sprite.zPosition = 5
             self.addChild(sprite)
         }
         
@@ -311,7 +313,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         jump.position = CGPointMake(frame.width / 1.1, frame.height / 3.75)
         jump.name = "jump"
         jump.xScale = 0.3 * xScaler
-        jump.yScale = 0.3 * yScaler
+        jump.yScale = 0.3 * xScaler
+        jump.zPosition = 5
         self.addChild(jump)
     }
     
@@ -321,22 +324,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         fire.name = "fire"
         fire.position = CGPointMake(frame.width / 10.0, frame.height / 3.75)
         fire.xScale = 0.3 * xScaler
-        fire.yScale = 0.3 * yScaler
+        fire.yScale = 0.3 * xScaler
+        fire.zPosition = 5
         self.addChild(fire)
     }
     
     func addManaOverlay(){
         manaOver = SKSpriteNode(texture: heroAtlas.textureNamed("mana_bar"))
         manaOver.position = CGPointMake(frame.width / 8.4, frame.height / 1.24)
-        manaOver.physicsBody?.dynamic = false;
+        manaOver.physicsBody?.dynamic = false
+        manaOver.zPosition = 5
         self.addChild(manaOver)
     }
     
     func runForward()
     {
         let hero_run_anim = SKAction.animateWithTextures([
-            heroAtlas.textureNamed("10Xmini_wizard_running1"),
-            heroAtlas.textureNamed("10Xmini_wizard_running2")
+            heroAtlas.textureNamed("10Xmini_wizard_running1\(SkinSuffix)"),
+            heroAtlas.textureNamed("10Xmini_wizard_running2\(SkinSuffix)")
             ], timePerFrame: 0.12)
         
         let run = SKAction.repeatActionForever(hero_run_anim)
@@ -360,6 +365,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
             sprite.physicsBody?.dynamic = false
             sprite.physicsBody?.restitution = 0
             sprite.setScale(2.0)
+            sprite.zPosition = 0
             sprite.position = CGPointMake(i * sprite.size.width, sprite.size.height / 2.0)
             sprite.runAction(moveGroundSpritesForever)
             TheGame.addChild(sprite)
@@ -432,7 +438,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     func calcEnemy(){
         var randomnumber:UInt32 = UInt32(pow(1.01, Double(-(time-200))))
         
-        var randomnumbers:UInt32 = 2 * (randomnumber + 100)
+        var randomnumbers:UInt32 = (randomnumber + 100)
         
         var random = arc4random_uniform(randomnumbers)
         
@@ -460,6 +466,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         
     }
     
+    deinit {
+        println("GameScene is being deinitialized")
+    }
     
     
 }

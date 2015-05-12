@@ -28,10 +28,20 @@ class MainMenu: SKScene
 {
     let heroAtlas = SKTextureAtlas(named: "wizard.atlas")
     var Screen: SKSpriteNode!
+    
+    //Scoreboard/highscore vars
     var ScoreBoarder: UITextField!
-    var HighScoreBoard: UITextField!
     var PreviousScore: Int!
-    var Game = false
+    var HighScoreBoard: UITextField!
+    
+    //Gem variables
+    var GemBoard: UITextField!
+    var gem:SKSpriteNode!
+    
+    //Keeps track of whether the game has run at least once (So ads wont load immediately)
+    var GameNumber: Int!
+
+    //For cross platform (iPhone, iPad, etc.)
     let xScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("xScale"))
     let yScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("yScale"))
     
@@ -41,11 +51,26 @@ class MainMenu: SKScene
         Screen = SKSpriteNode()
         self.addChild(Screen)
         addBackground()
+        addHighScore()
+        addScoreBoard(view)
+        addGemBoard(view)
         addStartButton()
         addOptionButton()
         addStoreButton()
-        addHighScore()
-        addScoreBoard()
+        
+        
+        var randomnumber:UInt32 = 0
+        
+        var random = arc4random_uniform(randomnumber)
+        println(random)
+        
+        println(GameNumber)
+        if(GameNumber? > 0){
+            if((Int)(random) == 0){
+                println("run")
+                NSNotificationCenter.defaultCenter().postNotificationName("runadsID", object: nil)
+            }
+        }
 
     }
     
@@ -75,11 +100,9 @@ class MainMenu: SKScene
                             
                             /* Sprite Kit applies additional optimizations to improve rendering performance */
                             
-                            //sets ignoreSiblingOrder to false the first game because of XCode Glitch where background was rendering over player for some reason
-                            skView.ignoresSiblingOrder = false
-                            if(Game){
-                                skView.ignoresSiblingOrder = true
-                            }
+                          
+                            skView.ignoresSiblingOrder = true
+                            
                             
                             if let scene = GameScene.unarchiveFromFile("GameScene") as? GameScene
                             {
@@ -100,16 +123,18 @@ class MainMenu: SKScene
                             
                         }else if(spriteNode.name == "ShopButton"){
                             
-                            let scene = ShopMenu()
-                            scene.scaleMode = .AspectFill
-                            scene.size = skView.bounds.size
-                            skView.presentScene(scene)
+                            let sceneries = ShoppingMenu()
+                            sceneries.scaleMode = .AspectFill
+                            sceneries.size = skView.bounds.size
+                            skView.presentScene(sceneries)
                             /* Set the scale mode to scale to fit the window */
                             
                         }
                         
                         ScoreBoarder.removeFromSuperview()
                         HighScoreBoard.removeFromSuperview()
+                        gem.removeFromParent()
+                        GemBoard.removeFromSuperview()
                         
                     }
                 }
@@ -137,7 +162,7 @@ class MainMenu: SKScene
     
     func addOptionButton(){
         var OptionButton: SKSpriteNode!
-        OptionButton = SKSpriteNode(texture: heroAtlas.textureNamed("Start"))
+        OptionButton = SKSpriteNode(texture: heroAtlas.textureNamed("Options"))
         OptionButton.position = CGPointMake(frame.width / 2, frame.height / 3.44)
         OptionButton.name = "OptionButton"
         OptionButton.xScale = xScaler
@@ -147,7 +172,7 @@ class MainMenu: SKScene
     
     func addStoreButton(){
         var ShopButton: SKSpriteNode!
-        ShopButton = SKSpriteNode(texture: heroAtlas.textureNamed("Start"))
+        ShopButton = SKSpriteNode(texture: heroAtlas.textureNamed("Shop"))
         ShopButton.position = CGPointMake(frame.width / 2, frame.height / 6)
         ShopButton.name = "ShopButton"
         ShopButton.xScale = xScaler
@@ -167,8 +192,8 @@ class MainMenu: SKScene
         
     }
     
-    func addScoreBoard(){
-        ScoreBoarder = UITextField(frame: CGRect(x: 520, y: 26, width: 300, height: 20))
+    func addScoreBoard(view:SKView){
+        ScoreBoarder = UITextField(frame: CGRect(x: view.bounds.width / 1.3, y: 26, width: 300, height: 20))
         ScoreBoarder.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
         if(PreviousScore != nil){
             ScoreBoarder.text = "Previous: \(PreviousScore)"
@@ -177,9 +202,23 @@ class MainMenu: SKScene
         self.view?.addSubview(ScoreBoarder)
     }
     
+    func addGemBoard(view: SKView){
+        gem = SKSpriteNode(texture: heroAtlas.textureNamed("Gem"))
+        gem.position = CGPointMake(view.bounds.width * (1/30), view.bounds.height/16)
+        gem.xScale = xScaler
+        gem.yScale = yScaler
+        Screen.addChild(gem)
+        
+        GemBoard = UITextField(frame: CGRect(x: view.bounds.width / 15, y: view.bounds.height * (59/64), width: view.bounds.width / 35, height: 20))
+        GemBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
+        GemBoard.textColor = UIColor.greenColor()
+        let Gemcount = NSUserDefaults.standardUserDefaults().integerForKey("Gems")
+        GemBoard.text = "\(Gemcount)"
+        view.addSubview(GemBoard)
+    }
     func updateHScore(PScore:Int){
         PreviousScore = PScore
-        Game = true
+
         
         //takes previous HighScore Value and compares it to the previous score to see if a new highscore was set
         var preHScore: Int = NSUserDefaults.standardUserDefaults().integerForKey("HighScore")
@@ -189,10 +228,19 @@ class MainMenu: SKScene
             NSUserDefaults.standardUserDefaults().setObject(PScore, forKey: "HighScore")
 
         }
-        var Coin:Int = NSUserDefaults.standardUserDefaults().integerForKey("Coins")
-        Coin = Coin + Int(PScore/1000)
-        NSUserDefaults.standardUserDefaults().setInteger(Coin, forKey: "Coins")
-        println(Coin)
+        var Gems:Int = NSUserDefaults.standardUserDefaults().integerForKey("Gems")
+        Gems = Gems + Int(PScore/1000)
+        NSUserDefaults.standardUserDefaults().setInteger(Gems, forKey: "Gems")
+        
+        GameNumber = 1
+    }
+    
+    deinit {
+        GameNumber = 1
+        NSNotificationCenter.defaultCenter().postNotificationName("loadadsID", object: nil)
+        println("MainMenu is being deinitialized")
+        //I call this so that the Ad will run if the person goes to options first before playing a game,
+        println("deinit")
     }
     
     

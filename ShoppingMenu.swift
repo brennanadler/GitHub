@@ -16,6 +16,7 @@ class ShoppingMenu: SKScene
     var ShopButton2: SKSpriteNode!
     var ShopButton3: SKSpriteNode!
     var ExitButton1: SKSpriteNode!
+    var ReturnButton1: SKSpriteNode!
     
     //variables for the gem counter at the bottom
     var gem: SKSpriteNode!
@@ -36,28 +37,28 @@ class ShoppingMenu: SKScene
     func addBg(view: SKView){
         
         ShopButton1 = SKSpriteNode(texture: heroAtlas.textureNamed("ShopButton"))
-        ShopButton1.position = CGPointMake(view.bounds.width/6, view.bounds.height/2)
+        ShopButton1.position = CGPointMake(view.bounds.width/5, view.bounds.height/2)
         ShopButton1.name = "ShopButton1"
-        ShopButton1.xScale = xScaler
-        ShopButton1.yScale = yScaler
+        ShopButton1.xScale = xScaler * 0.9
+        ShopButton1.yScale = yScaler * 0.9
         Screen.addChild(ShopButton1)
         
         ShopButton2 = SKSpriteNode(texture: heroAtlas.textureNamed("ShopButton"))
         ShopButton2.position = CGPointMake(view.bounds.width/2, view.bounds.height/2)
         ShopButton2.name = "ShopButton2"
-        ShopButton2.xScale = xScaler
-        ShopButton2.yScale = yScaler
+        ShopButton2.xScale = xScaler * 0.9
+        ShopButton2.yScale = yScaler * 0.9
         Screen.addChild(ShopButton2)
         
         ShopButton3 = SKSpriteNode(texture: heroAtlas.textureNamed("ShopButton"))
-        ShopButton3.position = CGPointMake(view.bounds.width * (5/6), view.bounds.height/2)
+        ShopButton3.position = CGPointMake(view.bounds.width * (4/5), view.bounds.height/2)
         ShopButton3.name = "ShopButton3"
-        ShopButton3.xScale = xScaler
-        ShopButton3.yScale = yScaler
+        ShopButton3.xScale = xScaler * 0.9
+        ShopButton3.yScale = yScaler * 0.9
         Screen.addChild(ShopButton3)
         
         ExitButton1 = SKSpriteNode(texture: heroAtlas.textureNamed("ExitButton"))
-        ExitButton1.position = CGPointMake(view.bounds.width * (22/23), view.bounds.height * (19/20))
+        ExitButton1.position = CGPointMake(view.bounds.width * (96/100), view.bounds.height * (94/100))
         ExitButton1.name = "ExitButton1"
         ExitButton1.xScale = xScaler
         ExitButton1.yScale = xScaler
@@ -103,8 +104,10 @@ class ShoppingMenu: SKScene
                             deleteButtons()
                         }else if spriteNode.name == "ExitButton1"
                         {
-                            println("exit")
                             returntoMain()
+                        }else if spriteNode.name == "ReturnButton1"
+                        {
+                            returnButton()
                         }
                         
                     }
@@ -117,7 +120,14 @@ class ShoppingMenu: SKScene
         ShopButton1.removeFromParent()
         ShopButton2.removeFromParent()
         ShopButton3.removeFromParent()
-        
+        println("return")
+        ReturnButton1 = SKSpriteNode(texture: heroAtlas.textureNamed("return"))
+        ReturnButton1.position = CGPointMake(self.view!.bounds.width * (7/100), self.view!.bounds.height * (94/100))
+        ReturnButton1.name = "ReturnButton1"
+        ReturnButton1.xScale = xScaler
+        ReturnButton1.yScale = yScaler
+        Screen.addChild(ReturnButton1)
+
     }
     
     func returntoMain(){
@@ -134,12 +144,28 @@ class ShoppingMenu: SKScene
         scene.scaleMode = .AspectFill
         scene.size = viewer.bounds.size
         
+        //this line just makes Game = 1
+        scene.updateHScore(0)
         viewer.presentScene(scene)
-        
         
     }
     
-    
+    func returnButton(){
+        let scene = ShoppingMenu()
+        let viewer = self.view as SKView!
+        viewer.showsFPS = true
+        viewer.showsNodeCount = true
+        
+        /* Sprite Kit applies additional optimizations to improve rendering performance */
+        viewer.ignoresSiblingOrder = true
+        
+        /* Set the scale mode to scale to fit the window */
+        scene.scaleMode = .AspectFill
+        scene.size = viewer.bounds.size
+        
+        viewer.presentScene(scene)
+    }
+
     
     
 }

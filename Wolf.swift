@@ -1,13 +1,13 @@
 import Foundation
 import SpriteKit
 
-class Enemy: SKSpriteNode {
+class Bat: SKSpriteNode {
     
     
-    class func createEnemy(location: CGPoint) -> Enemy {
+    class func createEnemy(location: CGPoint) -> Bat {
         let heroAtlas = SKTextureAtlas(named: "wizard.atlas")
         
-        let sprite = Enemy(texture: heroAtlas.textureNamed("10XBat1"))
+        let sprite = Bat(texture: heroAtlas.textureNamed("10XBat1"))
         sprite.position = location
         let spriteSize = CGSizeMake(sprite.size.width, sprite.size.height)
         let spriteCenter = CGPointMake(sprite.position.x/2, sprite.position.y/2)
@@ -16,7 +16,7 @@ class Enemy: SKSpriteNode {
         if let physics = sprite.physicsBody {
             physics.affectedByGravity = false
             physics.allowsRotation = false
-
+            
             physics.velocity = CGVectorMake(-300, 0)
             physics.mass = 0
             physics.restitution = 0

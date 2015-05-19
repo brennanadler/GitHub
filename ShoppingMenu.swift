@@ -16,7 +16,7 @@ class ShoppingMenu: SKScene
     var ShopButton2: SKSpriteNode!
     var ShopButton3: SKSpriteNode!
     var ExitButton1: SKSpriteNode!
-    var ReturnButton1: SKSpriteNode!
+    var BackButton1: SKSpriteNode!
     
     //variables for the gem counter at the bottom
     var gem: SKSpriteNode!
@@ -31,38 +31,39 @@ class ShoppingMenu: SKScene
         Screen = SKSpriteNode()
         self.addChild(Screen)
         addBg(view)
-        NSNotificationCenter.defaultCenter().postNotificationName("loadadsID", object: nil)
     }
     
     func addBg(view: SKView){
         
         ShopButton1 = SKSpriteNode(texture: heroAtlas.textureNamed("ShopButton"))
-        ShopButton1.position = CGPointMake(view.bounds.width/5, view.bounds.height/2)
+        ShopButton1.position = CGPointMake(view.bounds.width/6, view.bounds.height/2)
         ShopButton1.name = "ShopButton1"
-        ShopButton1.xScale = xScaler * 0.9
-        ShopButton1.yScale = yScaler * 0.9
+        ShopButton1.xScale = xScaler
+        ShopButton1.yScale = yScaler
         Screen.addChild(ShopButton1)
         
         ShopButton2 = SKSpriteNode(texture: heroAtlas.textureNamed("ShopButton"))
         ShopButton2.position = CGPointMake(view.bounds.width/2, view.bounds.height/2)
         ShopButton2.name = "ShopButton2"
-        ShopButton2.xScale = xScaler * 0.9
-        ShopButton2.yScale = yScaler * 0.9
+        ShopButton2.xScale = xScaler
+        ShopButton2.yScale = yScaler
         Screen.addChild(ShopButton2)
         
         ShopButton3 = SKSpriteNode(texture: heroAtlas.textureNamed("ShopButton"))
-        ShopButton3.position = CGPointMake(view.bounds.width * (4/5), view.bounds.height/2)
+        ShopButton3.position = CGPointMake(view.bounds.width * (5/6), view.bounds.height/2)
         ShopButton3.name = "ShopButton3"
-        ShopButton3.xScale = xScaler * 0.9
-        ShopButton3.yScale = yScaler * 0.9
+        ShopButton3.xScale = xScaler
+        ShopButton3.yScale = yScaler
         Screen.addChild(ShopButton3)
         
-        ExitButton1 = SKSpriteNode(texture: heroAtlas.textureNamed("ExitButton"))
-        ExitButton1.position = CGPointMake(view.bounds.width * (96/100), view.bounds.height * (94/100))
+        ExitButton1 = SKSpriteNode( texture: heroAtlas.textureNamed("fire_button"))
+        ExitButton1.position = CGPointMake(view.bounds.width * (22/23), view.bounds.height * (19/20))
         ExitButton1.name = "ExitButton1"
-        ExitButton1.xScale = xScaler
-        ExitButton1.yScale = xScaler
+        ExitButton1.xScale = 0.1 * xScaler
+        ExitButton1.yScale = 0.1 * yScaler
         Screen.addChild(ExitButton1)
+        
+
         
         gem = SKSpriteNode(texture: heroAtlas.textureNamed("Gem"))
         gem.position = CGPointMake(view.bounds.width * (1/30), view.bounds.height/16)
@@ -78,7 +79,7 @@ class ShoppingMenu: SKScene
         view.addSubview(GemBoard)
     }
     
-    override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
+    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)
     {
         
         for touch: AnyObject in touches
@@ -105,9 +106,9 @@ class ShoppingMenu: SKScene
                         }else if spriteNode.name == "ExitButton1"
                         {
                             returntoMain()
-                        }else if spriteNode.name == "ReturnButton1"
+                        }else if spriteNode.name == "BackButton1"
                         {
-                            returnButton()
+                            backtoshop()
                         }
                         
                     }
@@ -120,52 +121,60 @@ class ShoppingMenu: SKScene
         ShopButton1.removeFromParent()
         ShopButton2.removeFromParent()
         ShopButton3.removeFromParent()
-        println("return")
-        ReturnButton1 = SKSpriteNode(texture: heroAtlas.textureNamed("return"))
-        ReturnButton1.position = CGPointMake(self.view!.bounds.width * (7/100), self.view!.bounds.height * (94/100))
-        ReturnButton1.name = "ReturnButton1"
-        ReturnButton1.xScale = xScaler
-        ReturnButton1.yScale = yScaler
-        Screen.addChild(ReturnButton1)
-
+        
+        BackButton1 = SKSpriteNode( texture: heroAtlas.textureNamed("fire_button"))
+        BackButton1.position = CGPointMake(view!.bounds.width * (1/23), view!.bounds.height * (19/20))
+        BackButton1.name = "BackButton1"
+        BackButton1.xScale = 0.1 * xScaler
+        BackButton1.yScale = 0.1 * yScaler
+        Screen.addChild(BackButton1)
     }
     
     func returntoMain(){
+        let scene = GameScene()
         // Configure the view.
-        let scene = MainMenu()
-        let viewer = self.view as SKView!
-        viewer.showsFPS = true
-        viewer.showsNodeCount = true
+        let skView = self.view as SKView!
+        skView.showsFPS = true
+        skView.showsNodeCount = true
         
         /* Sprite Kit applies additional optimizations to improve rendering performance */
-        viewer.ignoresSiblingOrder = true
+        skView.ignoresSiblingOrder = true
         
         /* Set the scale mode to scale to fit the window */
         scene.scaleMode = .AspectFill
-        scene.size = viewer.bounds.size
+        scene.size = skView.bounds.size
+        println("This")
         
-        //this line just makes Game = 1
-        scene.updateHScore(0)
-        viewer.presentScene(scene)
+        GemBoard.removeFromSuperview()
+        
+        skView.presentScene(scene)
+        
         
     }
     
-    func returnButton(){
-        let scene = ShoppingMenu()
-        let viewer = self.view as SKView!
-        viewer.showsFPS = true
-        viewer.showsNodeCount = true
+    func backtoshop(){
+        
+        let scene = ShopMenu()
+        // Configure the view.
+        let skView = self.view as SKView!
+        skView.showsFPS = true
+        skView.showsNodeCount = true
         
         /* Sprite Kit applies additional optimizations to improve rendering performance */
-        viewer.ignoresSiblingOrder = true
+        skView.ignoresSiblingOrder = true
         
         /* Set the scale mode to scale to fit the window */
         scene.scaleMode = .AspectFill
-        scene.size = viewer.bounds.size
+        scene.size = skView.bounds.size
+        println("This")
         
-        viewer.presentScene(scene)
+        
+        
+        skView.presentScene(scene)
+        
     }
-
+    
+    
     
     
 }

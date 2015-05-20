@@ -17,6 +17,10 @@
         var ShopButton3: SKSpriteNode!
         var ExitButton1: SKSpriteNode!
         var BackButton1: SKSpriteNode!
+        var Fireskin: SKSpriteNode!
+        var Price: UITextField!
+        var FireskinBought: Int!
+        var GemCount: Int = NSUserDefaults.standardUserDefaults().integerForKey("Gems")
         
         //variables for the gem counter at the bottom
         var gem: SKSpriteNode!
@@ -79,7 +83,7 @@
             view.addSubview(GemBoard)
         }
         
-        override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
+        override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)
         {
             
             for touch: AnyObject in touches
@@ -97,6 +101,7 @@
                             if spriteNode.name == "ShopButton1"
                             {
                                 deleteButtons()
+                                skins()
                             }else if spriteNode.name == "ShopButton2"
                             {
                                 deleteButtons()
@@ -109,7 +114,11 @@
                             }else if spriteNode.name == "BackButton1"
                             {
                                 backtoshop()
+                            }else if spriteNode.name == "Fireskin"
+                            {
+                                buyFireSkin()
                             }
+                            
                             
                         }
                     }
@@ -174,11 +183,52 @@
             
         }
         
+        func skins(){
+            
+            Fireskin = SKSpriteNode( texture: heroAtlas.textureNamed("10Xmini_wizard_1"))
+            Fireskin.position = CGPointMake(view!.bounds.width * (1/2), view!.bounds.height * (2/3))
+            Fireskin.name = "Fireskin"
+            Fireskin.xScale = 0.3 * xScaler
+            Fireskin.yScale = 0.3 * xScaler
+            Screen.addChild(Fireskin)
+            
+            gem = SKSpriteNode(texture: heroAtlas.textureNamed("Gem"))
+            gem.position = CGPointMake(view!.bounds.width * (14/30), view!.bounds.height * (10/30))
+            gem.xScale = xScaler
+            gem.yScale = yScaler
+            Screen.addChild(gem)
+            
+            Price = UITextField(frame: CGRect(x: view!.bounds.width * (16/30), y: view!.bounds.height * (18/30), width: 300, height: 20))
+            Price.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
+            Price.textColor = UIColor.greenColor()
+            Price.text = "100"
+            view!.addSubview(Price)
+            
+            
+        }
         
+        func buyFireSkin(){
+            FireskinBought = NSUserDefaults.standardUserDefaults().integerForKey("fireIsBought")
+            if(FireskinBought == 1){
+                NSUserDefaults.standardUserDefaults()
+                
+            }else{
+                if(GemCount >= 100){
+                GemCount = GemCount - 100
+                NSUserDefaults.standardUserDefaults().setInteger(GemCount, forKey: "Gems")
+                    NSUserDefaults.standardUserDefaults()
+                }
+            }
+            
+            
+            
+        }
         
-        
-}
-
-
+        deinit{
+            GemBoard.removeFromSuperview()
+        }
+    }
+    
+    
     
     

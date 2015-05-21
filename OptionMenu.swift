@@ -42,7 +42,7 @@ class OptionMenu: SKScene
         
     }
     
-    override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
+    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)
     {
         
         

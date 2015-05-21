@@ -9,13 +9,13 @@
 import SpriteKit
 
 extension SKNode {
-    class func unarchiveFromFile(file : NSString) -> SKNode? {
+    class func unarchiveFromFile(file : String) -> SKNode? {
         if let path = NSBundle.mainBundle().pathForResource(file, ofType: "sks") {
             var sceneData = NSData(contentsOfFile: path, options: .DataReadingMappedIfSafe, error: nil)!
             var archiver = NSKeyedUnarchiver(forReadingWithData: sceneData)
             
             archiver.setClass(self.classForKeyedUnarchiver(), forClassName: "SKScene")
-            let scene = archiver.decodeObjectForKey(NSKeyedArchiveRootObjectKey) as GameScene
+            let scene = archiver.decodeObjectForKey(NSKeyedArchiveRootObjectKey) as! GameScene
             archiver.finishDecoding()
             return scene
         } else {
@@ -39,7 +39,7 @@ class MainMenu: SKScene
     var gem:SKSpriteNode!
     
     //Keeps track of whether the game has run at least once (So ads wont load immediately)
-    var GameNumber: Int!
+    var GameNumber: Int?
 
     //For cross platform (iPhone, iPad, etc.)
     let xScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("xScale"))
@@ -62,12 +62,9 @@ class MainMenu: SKScene
         var randomnumber:UInt32 = 0
         
         var random = arc4random_uniform(randomnumber)
-        println(random)
         
-        println(GameNumber)
-        if(GameNumber? > 0){
+        if(GameNumber > 0){
             if((Int)(random) == 0){
-                println("run")
                 NSNotificationCenter.defaultCenter().postNotificationName("runadsID", object: nil)
             }
         }
@@ -75,7 +72,7 @@ class MainMenu: SKScene
     }
     
     
-    override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
+    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)
     {
         
         for touch: AnyObject in touches
@@ -135,6 +132,7 @@ class MainMenu: SKScene
                         HighScoreBoard.removeFromSuperview()
                         gem.removeFromParent()
                         GemBoard.removeFromSuperview()
+                        "removeGemFromMain"
                         
                     }
                 }
@@ -147,6 +145,7 @@ class MainMenu: SKScene
         MainMenu.position = CGPointMake(frame.width / 2, frame.height / 2)
         MainMenu.xScale = xScaler
         MainMenu.yScale = yScaler
+        MainMenu.zPosition = 3
         addChild(MainMenu)
     }
     
@@ -157,6 +156,7 @@ class MainMenu: SKScene
         StartButton.name = "StartButton"
         StartButton.xScale = xScaler
         StartButton.yScale = yScaler
+        StartButton.zPosition = 3
         addChild(StartButton)
     }
     
@@ -167,6 +167,7 @@ class MainMenu: SKScene
         OptionButton.name = "OptionButton"
         OptionButton.xScale = xScaler
         OptionButton.yScale = yScaler
+        OptionButton.zPosition = 3
         addChild(OptionButton)
     }
     
@@ -177,6 +178,7 @@ class MainMenu: SKScene
         ShopButton.name = "ShopButton"
         ShopButton.xScale = xScaler
         ShopButton.yScale = yScaler
+        ShopButton.zPosition = 3
         addChild(ShopButton)
     }
     func addHighScore(){
@@ -207,9 +209,10 @@ class MainMenu: SKScene
         gem.position = CGPointMake(view.bounds.width * (1/30), view.bounds.height/16)
         gem.xScale = xScaler
         gem.yScale = yScaler
+        gem.zPosition = 3
         Screen.addChild(gem)
         
-        GemBoard = UITextField(frame: CGRect(x: view.bounds.width / 15, y: view.bounds.height * (59/64), width: view.bounds.width / 35, height: 20))
+        GemBoard = UITextField(frame: CGRect(x: view.bounds.width / 15, y: view.bounds.height * (59/64), width: view.bounds.width / 2, height: 20))
         GemBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
         GemBoard.textColor = UIColor.greenColor()
         let Gemcount = NSUserDefaults.standardUserDefaults().integerForKey("Gems")
@@ -238,9 +241,7 @@ class MainMenu: SKScene
     deinit {
         GameNumber = 1
         NSNotificationCenter.defaultCenter().postNotificationName("loadadsID", object: nil)
-        println("MainMenu is being deinitialized")
-        //I call this so that the Ad will run if the person goes to options first before playing a game,
-        println("deinit")
+        GemBoard.removeFromSuperview()
     }
     
     

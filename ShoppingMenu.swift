@@ -18,8 +18,9 @@
         var ExitButton1: SKSpriteNode!
         var BackButton1: SKSpriteNode!
         var Fireskin: SKSpriteNode!
+        var DefaultSkin:SKSpriteNode!
         var Price: UITextField!
-        var FireskinBought: Int!
+        var Price1: UITextField!
         var GemCount: Int = NSUserDefaults.standardUserDefaults().integerForKey("Gems")
         
         //variables for the gem counter at the bottom
@@ -114,9 +115,12 @@
                             }else if spriteNode.name == "BackButton1"
                             {
                                 backtoshop()
-                            }else if spriteNode.name == "Fireskin"
+                            }else if spriteNode.name == "FireSkin"
                             {
-                                buyFireSkin()
+                                buySkin("2", skinValue: 100)
+                            }else if spriteNode.name == "DefaultSkin"
+                            {
+                                buySkin("1", skinValue: 0)
                             }
                             
                             
@@ -152,11 +156,15 @@
             /* Set the scale mode to scale to fit the window */
             scene.scaleMode = .AspectFill
             scene.size = skView.bounds.size
-            println("This")
             
             GemBoard.removeFromSuperview()
             scene.updateHScore(0)
             
+            if(Price != nil){
+                Price.removeFromSuperview()
+                Price1.removeFromSuperview()
+            }
+
             skView.presentScene(scene)
             
             
@@ -176,59 +184,92 @@
             /* Set the scale mode to scale to fit the window */
             scene.scaleMode = .AspectFill
             scene.size = skView.bounds.size
+            Price.removeFromSuperview()
+            Price1.removeFromSuperview()
+            
             GemBoard.removeFromSuperview()
-            
-            
             skView.presentScene(scene)
             
         }
         
         func skins(){
             
-            Fireskin = SKSpriteNode( texture: heroAtlas.textureNamed("10Xmini_wizard_1"))
-            Fireskin.position = CGPointMake(view!.bounds.width * (1/2), view!.bounds.height * (2/3))
-            Fireskin.name = "Fireskin"
+            Fireskin = SKSpriteNode( texture: heroAtlas.textureNamed("10Xmini_wizard_2"))
+            Fireskin.position = CGPointMake(view!.bounds.width * (1/2), view!.bounds.height * (4/5))
+            Fireskin.name = "FireSkin"
             Fireskin.xScale = 0.3 * xScaler
             Fireskin.yScale = 0.3 * xScaler
             Screen.addChild(Fireskin)
             
             gem = SKSpriteNode(texture: heroAtlas.textureNamed("Gem"))
-            gem.position = CGPointMake(view!.bounds.width * (14/30), view!.bounds.height * (10/30))
+            gem.position = CGPointMake(view!.bounds.width * (47/100), view!.bounds.height * (63/100))
             gem.xScale = xScaler
             gem.yScale = yScaler
             Screen.addChild(gem)
             
-            Price = UITextField(frame: CGRect(x: view!.bounds.width * (16/30), y: view!.bounds.height * (18/30), width: 300, height: 20))
+            Price = UITextField(frame: CGRect(x: view!.bounds.width * (50/100), y: view!.bounds.height * (35/100), width: 300, height: 20))
             Price.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
             Price.textColor = UIColor.greenColor()
             Price.text = "100"
             view!.addSubview(Price)
             
+            DefaultSkin = SKSpriteNode( texture: heroAtlas.textureNamed("10Xmini_wizard_1"))
+            DefaultSkin.position = CGPointMake(view!.bounds.width * (25/100), view!.bounds.height * (80/100))
+            DefaultSkin.name = "DefaultSkin"
+            DefaultSkin.xScale = 0.3 * xScaler
+            DefaultSkin.yScale = 0.3 * xScaler
+            Screen.addChild(DefaultSkin)
+            
+            
+            Price1 = UITextField(frame: CGRect(x: view!.bounds.width * (25/100), y: view!.bounds.height * (35/100), width: 300, height: 20))
+            Price1.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
+            Price1.textColor = UIColor.greenColor()
+            Price1.text = "Free"
+            view!.addSubview(Price1)
+            
             
         }
         
-        func buyFireSkin(){
-            FireskinBought = NSUserDefaults.standardUserDefaults().integerForKey("fireIsBought")
-            if(FireskinBought == 1){
-                NSUserDefaults.standardUserDefaults()
-                
-            }else{
-                if(GemCount >= 100){
-                GemCount = GemCount - 100
-                NSUserDefaults.standardUserDefaults().setInteger(GemCount, forKey: "Gems")
-                    NSUserDefaults.standardUserDefaults()
+        func buySkin(skinType:String, skinValue:Int){
+
+            
+            if var skinSet = NSUserDefaults.standardUserDefaults().dictionaryForKey("skins")
+            {
+
+                if(skinSet[skinType]! as! NSObject == 0)
+                {
+                    println("you bought \(skinType)")
+                    
+                    //charge user
+                    if(GemCount >= skinValue)
+                    {
+                        GemCount = GemCount - skinValue
+                        NSUserDefaults.standardUserDefaults().setInteger(GemCount, forKey: "Gems")
+                        GemBoard.text = ("\(GemCount)")
+                        
+                        //update that user bought this
+                        skinSet[skinType] = 1
+                        NSUserDefaults.standardUserDefaults().setObject(skinSet, forKey: "skins")
+                        
+                        //code for texture
+                        NSUserDefaults.standardUserDefaults().setObject("_\(skinType)", forKey: "SkinSuffix")
+                    }else
+                    {
+                        println("you are broke")
+                    }
+                }else{
+                    println("already owned")
+                    NSUserDefaults.standardUserDefaults().setObject("_\(skinType)", forKey: "SkinSuffix")
                 }
-            }
-            
-            
+                
+
+   
             
         }
-        
-        deinit{
-            GemBoard.removeFromSuperview()
-        }
+
+
     }
     
-    
+}
     
     

@@ -57,6 +57,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         //sets physics collision delegator to this class
         self.physicsWorld.contactDelegate = self
 
+        println("10Xmini_wizard_running1\(SkinSuffix)")
         frames = 1
         time = 0
         timePassed = 0
@@ -86,7 +87,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         view.addSubview(ScoreBoard)
     }
     
-    override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
+    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)
     {
         
         for touch: AnyObject in touches
@@ -200,7 +201,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     }
     func addHero(view: SKView){
         //initializes our hero and sets his initial texture to running1
-        hero = SKSpriteNode(texture: heroAtlas.textureNamed("10Xmini_wizard\(SkinSuffix)"))
+        hero = SKSpriteNode(texture: heroAtlas.textureNamed("10Xmini_wizard_running1\(SkinSuffix)"))
         hero.xScale = 0.4
         hero.yScale = 0.4
         hero.position = CGPointMake(frame.width / 4.0, frame.height / 4.0)
@@ -284,7 +285,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         //spawns air unit
         if(type == "air"){
             let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/1.75)
-            let sprite = Enemy.createEnemy(endOfScreen)
+            let sprite = Bat.createEnemy(endOfScreen)
             
             sprite.physicsBody!.categoryBitMask = ColliderType.enemy.rawValue
             sprite.physicsBody!.contactTestBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue    | ColliderType.side.rawValue
@@ -296,7 +297,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         }else if(type == "ground"){
             
             let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/2.5)
-            let sprite = Enemy.createEnemy(endOfScreen)
+            let sprite = Wolf.createEnemy(endOfScreen)
             
             sprite.physicsBody!.categoryBitMask = ColliderType.enemy.rawValue
             sprite.physicsBody!.contactTestBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue    | ColliderType.side.rawValue
@@ -465,10 +466,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         self.addChild(side)
         
     }
-    
-    deinit {
-        println("GameScene is being deinitialized")
-    }
+
     
     
 }

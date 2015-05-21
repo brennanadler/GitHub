@@ -1,12 +1,3 @@
-
-
-
-
-
-
-
-
-
 import UIKit
 import SpriteKit
 import iAd
@@ -30,15 +21,33 @@ class GameViewController: UIViewController,ADInterstitialAdDelegate {
         var height:CGFloat = bounds.size.height
         
         //Makes a global variable to store the Scale variables (Default is iPhone6)
-        NSUserDefaults.standardUserDefaults().setFloat(Float(width / 667), forKey: "xScale")
-        NSUserDefaults.standardUserDefaults().setFloat(Float(height / 375), forKey: "yScale")
+
+    NSUserDefaults.standardUserDefaults().setFloat(Float(width / 667), forKey: "xScale")
+    NSUserDefaults.standardUserDefaults().setFloat(Float(height / 375), forKey: "yScale")
         
         //creates permanent Integer named "HighScore" that is an integer... Default value 0
         NSUserDefaults.standardUserDefaults().setInteger(0, forKey: "HighScore")
-        NSUserDefaults.standardUserDefaults().setInteger(50, forKey: "Gems")
+        NSUserDefaults.standardUserDefaults().setInteger(150, forKey: "Gems")
         
         //Skin Value
+    
         NSUserDefaults.standardUserDefaults().setObject("_1", forKey: "SkinSuffix")
+        println(NSUserDefaults.standardUserDefaults().objectForKey("SkinSuffix"))
+        
+        /**
+            Skin Codes:
+            1: Default
+            2: Fire
+        **/
+        
+        //dictionary of skins, 1 is bought/unlocked, 0 is not bought
+        var skins : [NSObject : AnyObject] = [
+            "1" : 1,
+            "2" : 0
+        ]
+
+        NSUserDefaults.standardUserDefaults().setObject(skins, forKey: "skins")
+
         
         //Notification that will run the func runAdd() and has name of runadsID
         NSNotificationCenter.defaultCenter().addObserver(self, selector: ("runAd:"),    name: "runadsID", object: nil)
@@ -47,7 +56,7 @@ class GameViewController: UIViewController,ADInterstitialAdDelegate {
         
         let scene = MainMenu()
         // Configure the view.
-        skView = self.view as SKView
+        skView = self.view as! SKView
         skView.showsFPS = true
         skView.showsNodeCount = true
         
@@ -106,14 +115,13 @@ class GameViewController: UIViewController,ADInterstitialAdDelegate {
     
     func presentInterlude(){
         // If the interstitial managed to load, then we'll present it now.
-        println("is ad loaded?")
         if (interstitial.loaded) {
             placeHolderView = UIView(frame: self.view.frame)
             self.view.addSubview(placeHolderView)
             
             interstitial.presentInView(placeHolderView)
             
-            var timer = NSTimer.scheduledTimerWithTimeInterval(2.0, target: self, selector: Selector("addCloser"), userInfo: nil, repeats: false)
+            var timer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("addCloser"), userInfo: nil, repeats: false)
             
         }
     }
@@ -123,6 +131,8 @@ class GameViewController: UIViewController,ADInterstitialAdDelegate {
             , y:  skView.bounds.height / 20, width: 25, height: 25))
         closeButton.setBackgroundImage(UIImage(named: "Exit"), forState: UIControlState.Normal)
         closeButton.addTarget(self, action: Selector("close"), forControlEvents: UIControlEvents.TouchDown)
+        closeButton.transform = CGAffineTransformMakeScale(1.2,1.2);
+        
         self.view.addSubview(closeButton)
     }
     // iAd Delegate Mehtods
@@ -133,11 +143,11 @@ class GameViewController: UIViewController,ADInterstitialAdDelegate {
     // if the content in the view has expired.
     
     func interstitialAdDidUnload(interstitialAd: ADInterstitialAd!){
-        self.placeHolderView.removeFromSuperview()
-        
-        closeButton.removeFromSuperview()
-        interstitial = nil
-        
+//        self.placeHolderView.removeFromSuperview()
+//        
+//        closeButton.removeFromSuperview()
+//        interstitial = nil
+        println("adDidUnload")
         cycleInterstitial()
     }
     

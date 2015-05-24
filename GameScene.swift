@@ -6,7 +6,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
     var TheGame: SKNode!
     
     let heroAtlas = SKTextureAtlas(named: "wizard.atlas")
-    var ScoreBoard: UITextField!
+    var ScoreBoard: UITextView!
     
     //Init SpritekitNodes
     var hero: SKSpriteNode!
@@ -56,8 +56,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         
         //sets physics collision delegator to this class
         self.physicsWorld.contactDelegate = self
+        
+        view.showsPhysics = true
 
-        println("10Xmini_wizard_running1\(SkinSuffix)")
         frames = 1
         time = 0
         timePassed = 0
@@ -80,9 +81,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         runForward()
         addSideKiller()
         
-        ScoreBoard = UITextField(frame: CGRect(x: view.bounds.width/1.35, y: 26, width: 300, height: 20))
+        ScoreBoard = UITextView(frame: CGRect(x: view.bounds.width/1.35, y: 26, width: 300, height: 20))
         ScoreBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 1.0)
         ScoreBoard.text = "Score: 0"
+        ScoreBoard.editable = false
         ScoreBoard.textColor = UIColor.blackColor()
         view.addSubview(ScoreBoard)
     }

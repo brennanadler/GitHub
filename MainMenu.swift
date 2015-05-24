@@ -30,12 +30,12 @@ class MainMenu: SKScene
     var Screen: SKSpriteNode!
     
     //Scoreboard/highscore vars
-    var ScoreBoarder: UITextField!
+    var ScoreBoarder: UITextView!
     var PreviousScore: Int!
-    var HighScoreBoard: UITextField!
+    var HighScoreBoard: UITextView!
     
     //Gem variables
-    var GemBoard: UITextField!
+    var GemBoard: UITextView!
     var gem:SKSpriteNode!
     
     //Keeps track of whether the game has run at least once (So ads wont load immediately)
@@ -183,7 +183,8 @@ class MainMenu: SKScene
     }
     func addHighScore(){
         
-        HighScoreBoard = UITextField(frame: CGRect(x: 16, y: 26, width: 300, height: 20))
+        HighScoreBoard = UITextView(frame: CGRect(x: 16, y: 26, width: 300, height: 20))
+        HighScoreBoard.editable = false
         HighScoreBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
         
         //this variable draws from the permanent value created earlier for Highscore
@@ -195,7 +196,8 @@ class MainMenu: SKScene
     }
     
     func addScoreBoard(view:SKView){
-        ScoreBoarder = UITextField(frame: CGRect(x: view.bounds.width / 1.3, y: 26, width: 300, height: 20))
+        ScoreBoarder = UITextView(frame: CGRect(x: view.bounds.width / 1.3, y: 26, width: 300, height: 20))
+        ScoreBoarder.editable = false
         ScoreBoarder.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
         if(PreviousScore != nil){
             ScoreBoarder.text = "Previous: \(PreviousScore)"
@@ -212,7 +214,8 @@ class MainMenu: SKScene
         gem.zPosition = 3
         Screen.addChild(gem)
         
-        GemBoard = UITextField(frame: CGRect(x: view.bounds.width / 15, y: view.bounds.height * (59/64), width: view.bounds.width / 2, height: 20))
+        GemBoard = UITextView(frame: CGRect(x: view.bounds.width / 15, y: view.bounds.height * (59/64), width: view.bounds.width / 2, height: 20))
+        GemBoard.editable = false
         GemBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
         GemBoard.textColor = UIColor.greenColor()
         let Gemcount = NSUserDefaults.standardUserDefaults().integerForKey("Gems")

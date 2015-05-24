@@ -32,7 +32,6 @@ class GameViewController: UIViewController,ADInterstitialAdDelegate {
         //Skin Value
     
         NSUserDefaults.standardUserDefaults().setObject("_1", forKey: "SkinSuffix")
-        println(NSUserDefaults.standardUserDefaults().objectForKey("SkinSuffix"))
         
         /**
             Skin Codes:

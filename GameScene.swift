@@ -1,474 +1,185 @@
+import UIKit
 import SpriteKit
+import iAd
 
 
-class GameScene: SKScene, SKPhysicsContactDelegate
-{
-    var TheGame: SKNode!
+class GameViewController: UIViewController,ADInterstitialAdDelegate {
     
-    let heroAtlas = SKTextureAtlas(named: "wizard.atlas")
-    var ScoreBoard: UITextView!
-    
-    //Init SpritekitNodes
-    var hero: SKSpriteNode!
-    var SkinSuffix = NSUserDefaults.standardUserDefaults().stringForKey("SkinSuffix")!
-    var manaOver: SKSpriteNode!
-    var manaBar: SKSpriteNode!
-    
-    //mana variables
-    var mana:CGFloat!
-    var maxMana:CGFloat!
-    var manaPercent:CGFloat!
-    var manaRegen:CGFloat!
-    var manaSize: CGSize!
-    var manaWidth: CGFloat!
-    
-    //Variables for fireball
-    var fireBallPoint: CGPoint!
-    var point: CGPoint!
-    
-    
-    //Time Variables
-    var time: Int!
-    var frames: Int!
-    var timePassed: Int!
-    
-    
-    //Score Variables
-    var Score: Int!
-    var HighScore: Int!
-    var PastScore: Int!
-    
-    //Scaler variables based on device dimensions
-    let xScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("xScale"))
-    let yScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("yScale"))
-    
-    //Stores the values for collisions
-    enum ColliderType:UInt32 {
-        case hero = 1
-        case enemy = 2
-        case fireball = 4
-        case ground = 8
-        case side = 16
-    }
-    
-    override func didMoveToView(view: SKView)
-    {
-        
-        //sets physics collision delegator to this class
-        self.physicsWorld.contactDelegate = self
-        
-        //view.showsPhysics = true
-
-        frames = 1
-        time = 0
-        timePassed = 0
-        Score = 0
-        PastScore = 0
-        
-        // setup physics/gravity
-        self.physicsWorld.gravity = CGVectorMake(0.0, -10)
-        
-        TheGame = SKNode()
-        self.addChild(TheGame)
-        
-        createSky()
-        createGround()
-        addFireButton()
-        addJumpButton()
-        addManaOverlay()
-        addHero(view)
-        addManaBar()
-        runForward()
-        addSideKiller()
-        
-        ScoreBoard = UITextView(frame: CGRect(x: view.bounds.width/1.35, y: 26, width: 300, height: 20))
-        ScoreBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 1.0)
-        ScoreBoard.text = "Score: 0"
-        ScoreBoard.editable = false
-        ScoreBoard.textColor = UIColor.blackColor()
-        view.addSubview(ScoreBoard)
-    }
-    
-    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)
-    {
-        
-        for touch: AnyObject in touches
-        {
-            
-            let location = touch.locationInNode(self)
-            var sprites = nodesAtPoint(location)
-            
-            for sprite in sprites {
-                if let spriteNode = sprite as? SKSpriteNode {
-                    if spriteNode.name != nil {
-                        if spriteNode.name == "jump" {
-                            
-                            // Do jump
-                            let jumping = SKAction.animateWithTextures([
-                                heroAtlas.textureNamed("10Xmini_wizard_running1\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping1\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)"),
-                                heroAtlas.textureNamed("10Xmini_wizard_jumping2\(SkinSuffix)")
-                                ], timePerFrame: 0.06)
-                            
-                            let jump = SKAction.repeatAction(jumping, count: 1)
-                            
-                            
-                            if (hero.actionForKey("jumping") == nil)
-                            {
-                                hero.runAction(jump, withKey: "jumping")
-                                hero.physicsBody?.velocity = CGVectorMake(0, 0)
-                                hero.physicsBody?.applyImpulse(CGVectorMake(0, 3750))
-                            }
-                            
-                        }
-                            
-                            //I have no idea why this doesn't work so I commented
-                            //out the code that adds the button
-                            // IT WORKS, #BrennanFixesAllOfSeansPoorCode
-                        else if spriteNode.name == "fire" {
-                            fireBall()
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    //this gets called automatically when 2 objects hit each other
-    func didBeginContact(contact: SKPhysicsContact)
-    {
-        //variable stores the two things contacting
-        let contactMask = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
-        
-        switch(contactMask){
-            
-        case ColliderType.hero.rawValue | ColliderType.enemy.rawValue:
-            
-            //Removes Score display and records the earned score
-            PastScore = Score
-            ScoreBoard.removeFromSuperview()
-            
-            // Configure the view.
-            let scene = MainMenu()
-            let skView = self.view as SKView!
-            skView.showsFPS = true
-            skView.showsNodeCount = true
-            
-            /* Sprite Kit applies additional optimizations to improve rendering performance */
-            skView.ignoresSiblingOrder = true
-            
-            /* Set the scale mode to scale to fit the window */
-            scene.scaleMode = .AspectFill
-            scene.size = skView.bounds.size
-            
-            //updates the high score and also saves the previous score value in the class
-            scene.updateHScore(PastScore)
-            skView.presentScene(scene)
-            
-        case ColliderType.fireball.rawValue | ColliderType.enemy.rawValue:
-            contact.bodyA.node?.removeFromParent()
-            contact.bodyB.node?.removeFromParent()
-            
-        case ColliderType.enemy.rawValue | ColliderType.side.rawValue:
-            contact.bodyB.node?.removeFromParent()
-            
-        default:
-            return
-            
-            
-            
-        }
-    }
-    
-    //this gets called automatically when 2 objects stop hitting each other
-    func didEndContact(contact: SKPhysicsContact)
-    {
-        
-    }
-    func addHero(view: SKView){
-        //initializes our hero and sets his initial texture to running1
-        hero = SKSpriteNode(texture: heroAtlas.textureNamed("10Xmini_wizard_running1\(SkinSuffix)"))
-        hero.xScale = 0.4
-        hero.yScale = 0.4
-        hero.position = CGPointMake(frame.width / 4.0, frame.height / 4.0)
-        
-        //creates some CG values for the hero to be used in its physics definitions
-        let heroSize = CGSizeMake(hero.size.width, hero.size.height)
-        let heroCenter = CGPointMake(hero.position.x/2, hero.position.y/2)
-        
-        hero.physicsBody = SKPhysicsBody(circleOfRadius: hero.size.width/2.6)
-        hero.physicsBody?.dynamic = true
-        hero.physicsBody?.mass = 4
-        hero.physicsBody?.restitution = 0
-        hero.physicsBody?.allowsRotation = false
-        
-        hero.zPosition = 5
-        
-        //Physics Collision stuff
-        //Tells the listener we care about this entity/stores its value
-        hero.physicsBody!.categoryBitMask = ColliderType.hero.rawValue
-        
-        //what this can collide with
-        hero.physicsBody!.contactTestBitMask = ColliderType.enemy.rawValue
-        
-        //Implements the listener
-        hero.physicsBody!.collisionBitMask = ColliderType.enemy.rawValue
-        self.addChild(hero);
-        
-    }
-    
-    func addManaBar(){
-        //init Mana Color
-        mana = 0
-        maxMana = 100
-        manaPercent = (mana/maxMana)*100
-        manaRegen = (10)
-        
-        manaWidth = manaPercent
-        manaSize = CGSize(width: manaWidth, height: 30)
-        manaBar = SKSpriteNode(color: UIColor(red: 20/255, green: 20/255, blue: 255/255, alpha: 1.0), size: manaSize)
-        manaBar.zPosition = 5
-        self.addChild(manaBar)
-    }
-    
-    
-    func fireBall(){
-        if mana >= 40 {
-            let firing = SKAction.animateWithTextures([
-                heroAtlas.textureNamed("10Xmini_wizard_firing\(SkinSuffix)"),
-                heroAtlas.textureNamed("10Xmini_wizard_firing\(SkinSuffix)"),
-                heroAtlas.textureNamed("10Xmini_wizard_firing\(SkinSuffix)"),
-                heroAtlas.textureNamed("10Xmini_wizard_firing\(SkinSuffix)")
-                ], timePerFrame: 0.08)
-            
-            let fire = SKAction.repeatAction(firing, count: 1)
-            
-            if (hero.actionForKey("firing") == nil)
-            {
-                hero.runAction(fire, withKey: "jumping")
-            }
-            
-            //creates the Fireball itself
-            let sprite = Fireball.createFireBall(point)
-            
-            //registers the fireball as something to pay attention to
-            sprite.physicsBody!.categoryBitMask = ColliderType.fireball.rawValue
-            
-            //tells the object what things it can bounce off of and so forth
-            sprite.physicsBody!.contactTestBitMask = ColliderType.fireball.rawValue
-            
-            //tells the object the we care when it hits this thing
-            sprite.physicsBody!.collisionBitMask = ColliderType.fireball.rawValue
-            
-            sprite.zPosition = 3
-            self.addChild(sprite)
-            mana = mana - 40
-        }
-    }
-    
-    func spawnEnemy(type: String){
-        
-        //spawns air unit
-        if(type == "air"){
-            let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/1.75)
-            let sprite = Bat.createEnemy(endOfScreen)
-            
-            sprite.physicsBody!.categoryBitMask = ColliderType.enemy.rawValue
-            sprite.physicsBody!.contactTestBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue    | ColliderType.side.rawValue
-            sprite.physicsBody!.collisionBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue | ColliderType.side.rawValue
-            sprite.zPosition = 5
-            self.addChild(sprite)
-            
-            // spawns ground unit
-        }else if(type == "ground"){
-            
-            let endOfScreen:CGPoint = CGPointMake(frame.width, frame.height/2.5)
-            let sprite = Wolf.createEnemy(endOfScreen)
-            
-            sprite.physicsBody!.categoryBitMask = ColliderType.enemy.rawValue
-            sprite.physicsBody!.contactTestBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue    | ColliderType.side.rawValue
-            sprite.physicsBody!.collisionBitMask = ColliderType.hero.rawValue | ColliderType.fireball.rawValue | ColliderType.side.rawValue
-            sprite.zPosition = 5
-            self.addChild(sprite)
-        }
-        
-    }
-    
-    func addJumpButton(){
-        var jump: SKSpriteNode!
-        jump = SKSpriteNode(texture: heroAtlas.textureNamed("jump_button"))
-        jump.position = CGPointMake(frame.width / 1.1, frame.height / 3.75)
-        jump.name = "jump"
-        jump.xScale = 0.3 * xScaler
-        jump.yScale = 0.3 * xScaler
-        jump.zPosition = 5
-        self.addChild(jump)
-    }
-    
-    func addFireButton(){
-        var fire: SKSpriteNode!
-        fire = SKSpriteNode(texture: heroAtlas.textureNamed("fire_button"))
-        fire.name = "fire"
-        fire.position = CGPointMake(frame.width / 10.0, frame.height / 3.75)
-        fire.xScale = 0.3 * xScaler
-        fire.yScale = 0.3 * xScaler
-        fire.zPosition = 5
-        self.addChild(fire)
-    }
-    
-    func addManaOverlay(){
-        manaOver = SKSpriteNode(texture: heroAtlas.textureNamed("mana_bar"))
-        manaOver.position = CGPointMake(frame.width / 8.4, frame.height / 1.24)
-        manaOver.physicsBody?.dynamic = false
-        manaOver.zPosition = 5
-        self.addChild(manaOver)
-    }
-    
-    func runForward()
-    {
-        let hero_run_anim = SKAction.animateWithTextures([
-            heroAtlas.textureNamed("10Xmini_wizard_running1\(SkinSuffix)"),
-            heroAtlas.textureNamed("10Xmini_wizard_running2\(SkinSuffix)")
-            ], timePerFrame: 0.12)
-        
-        let run = SKAction.repeatActionForever(hero_run_anim)
-        
-        hero.runAction(run, withKey: "running")
-    }
-    
-    func createGround()
-    {
-        let groundTexture = SKTexture(imageNamed: "bg")
-        groundTexture.filteringMode = .Nearest
-        
-        let moveGroundSprite = SKAction.moveByX(-groundTexture.size().width * 2.0, y: 0, duration: NSTimeInterval(0.01 * groundTexture.size().width * 1.0))
-        let resetGroundSprite = SKAction.moveByX(groundTexture.size().width * 2.0, y: 0, duration: 0.0)
-        let moveGroundSpritesForever = SKAction.repeatActionForever(SKAction.sequence([moveGroundSprite, resetGroundSprite]))
-        
-        for var i:CGFloat = 0; i < 2.0 + self.frame.size.width / (groundTexture.size().width * 2.0); ++i
-        {
-            let sprite = SKSpriteNode(texture: groundTexture)
-            sprite.physicsBody = SKPhysicsBody(rectangleOfSize: CGSize(width: groundTexture.size().width, height: frame.height/8))
-            sprite.physicsBody?.dynamic = false
-            sprite.physicsBody?.restitution = 0
-            sprite.setScale(2.0)
-            sprite.zPosition = 0
-            sprite.position = CGPointMake(i * sprite.size.width, sprite.size.height / 2.0)
-            sprite.runAction(moveGroundSpritesForever)
-            TheGame.addChild(sprite)
-        }
-    }
-    
-    func createSky()
-    {
-        let skyTexture = SKSpriteNode(color: UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 1.0), size: frame.size)
-        skyTexture.position = CGPointMake(frame.width / 2, frame.height / 2)
-        TheGame.addChild(skyTexture)
-    }
-    
-    override func update(currentTime: CFTimeInterval) {
-        /* Called before each frame is rendered */
-        
-        //calls update manabar
-        updateManaBar()
-        
-        //updates the CGpoint of hero's coordinates
-        point = CGPointMake(hero.position.x + 50, hero.position.y + 10)
-        
-        //adds a frame before every frame to keep track of time
-        frames = frames + 1
-        
-        //updates ScoreBoard
-        ScoreBoard.text = "Score: \(Score)"
-        
-        //calculates time in seconds
-        calculateTime()
-        
-        Score = Score + 1 + time
-        
-        calcEnemy()
-        
-    }
-    
-    //updates mana bar itself
-    func updateManaBar(){
-        calculateMana()
-        manaWidth = manaPercent
-        manaSize = CGSize(width: manaWidth * 1.2, height: 25)
-        manaBar.size = manaSize
-        manaBar.position = CGPointMake(frame.width / 8.4, frame.height / 1.24)
-        manaBar.physicsBody?.dynamic = false;
-    }
-    
-    //calculates mana values
-    func calculateMana(){
-        
-        mana = mana + manaRegen;
-        if (mana > maxMana){
-            mana = maxMana
-        }else if (mana < 1){
-            mana = 1
-        }
-        manaPercent = (mana/maxMana) * 100
-    }
-    
-    //function to calculate time in seconds
-    func calculateTime(){
-        
-        //if frames = 30 or higher (30 FPS) adds 1 to seconds
-        if frames >= 30{
-            frames = frames - 30
-            time = time + 1
-        }
-    }
-    
-    func calcEnemy(){
-        var randomnumber:UInt32 = UInt32(pow(1.01, Double(-(time-200))))
-        
-        var randomnumbers:UInt32 = (randomnumber + 100)
-        
-        var random = arc4random_uniform(randomnumbers)
-        
-        if(random == 1){
-            spawnEnemy("air")
-        }else if(random == 2){
-            spawnEnemy("ground")
-        }
-    }
-    
-    //Makes a Node on the left side of the screen that will kill all bats once the hit the edge of the screen so to reduce lag
-    func addSideKiller(){
-        
-        
-        let endOfScreenLeft:CGPoint = CGPointMake(0, frame.height/2)
-        let sizer: CGSize = CGSizeMake(CGFloat(10), CGFloat(1000))
-        
-        let side:SKNode = SKNode()
-        side.physicsBody = SKPhysicsBody(rectangleOfSize: sizer, center: endOfScreenLeft)
-        side.physicsBody!.dynamic = false
-        side.physicsBody!.categoryBitMask = ColliderType.side.rawValue
-        side.physicsBody!.contactTestBitMask = ColliderType.enemy.rawValue
-        side.physicsBody!.collisionBitMask = ColliderType.enemy.rawValue
-        self.addChild(side)
-        
-    }
+    var interstitial:ADInterstitialAd!
+    var placeHolderView:UIView!
+    var closeButton:UIButton!
+    var skView:SKView!
 
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        
+        //finds dimensions of screen (ipad vs iphone etc.)
+        var bounds: CGRect = UIScreen.mainScreen().bounds
+        var width:CGFloat = bounds.size.width
+        var height:CGFloat = bounds.size.height
+        
+        //Makes a global variable to store the Scale variables (Default is iPhone6)
+
+    NSUserDefaults.standardUserDefaults().setFloat(Float(width / 667), forKey: "xScale")
+    NSUserDefaults.standardUserDefaults().setFloat(Float(height / 375), forKey: "yScale")
+        
+        //creates permanent Integer named "HighScore" that is an integer... Default value 0
+        NSUserDefaults.standardUserDefaults().setInteger(0, forKey: "HighScore")
+        NSUserDefaults.standardUserDefaults().setInteger(150, forKey: "Gems")
+        
+        //Skin Value
+    
+        NSUserDefaults.standardUserDefaults().setObject("_1", forKey: "SkinSuffix")
+        
+        /**
+            Skin Codes:
+            1: Default
+            2: Fire
+        **/
+        
+        //dictionary of skins, 1 is bought/unlocked, 0 is not bought
+        var skins : [NSObject : AnyObject] = [
+            "1" : 1,
+            "2" : 0
+        ]
+
+        NSUserDefaults.standardUserDefaults().setObject(skins, forKey: "skins")
+
+        
+        //Notification that will run the func runAdd() and has name of runadsID
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: ("runAd:"),    name: "runadsID", object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: ("loadAd:"),    name: "loadadsID", object: nil)
+
+        
+        let scene = MainMenu()
+        // Configure the view.
+        skView = self.view as! SKView
+        skView.showsFPS = true
+        skView.showsNodeCount = true
+        
+        /* Sprite Kit applies additional optimizations to improve rendering performance */
+        skView.ignoresSiblingOrder = true
+        
+        /* Set the scale mode to scale to fit the window */
+        scene.scaleMode = .AspectFill
+        scene.size = skView.bounds.size
+        
+        skView.presentScene(scene)
+        
+    }
+    
+    override func shouldAutorotate() -> Bool {
+        return true
+    }
+    
+    override func supportedInterfaceOrientations() -> Int {
+        if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
+            return Int(UIInterfaceOrientationMask.AllButUpsideDown.rawValue)
+        } else {
+            return Int(UIInterfaceOrientationMask.All.rawValue)
+        }
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Release any cached data, images, etc that aren't in use.
+    }
+    
+    override func prefersStatusBarHidden() -> Bool {
+        return true
+    }
+    
+    //deletes previous ad and creates a new one, triggers at start of game to give it time to load
+    func loadAd(notification:NSNotification){
+        cycleInterstitial()
+    }
+    
+    //iAD interstitial
+    func runAd(notification:NSNotification){
+        //var timer = NSTimer.scheduledTimerWithTimeInterval(3.0, target: self, selector: Selector("dislayiAdInterstitial"), userInfo: nil, repeats: false)
+        dislayiAdInterstitial()
+    }
+    
+    func cycleInterstitial(){
+        
+        // Clean up the old interstitial...
+        //  interstitial.delegate = nil;
+        // and create a new interstitial. We set the delegate so that we can be notified of when
+        interstitial = ADInterstitialAd()
+        interstitial.delegate = self;
+
+    }
+    
+    func presentInterlude(){
+        // If the interstitial managed to load, then we'll present it now.
+        if (interstitial.loaded) {
+            placeHolderView = UIView(frame: self.view.frame)
+            self.view.addSubview(placeHolderView)
+            
+            interstitial.presentInView(placeHolderView)
+            
+            var timer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("addCloser"), userInfo: nil, repeats: false)
+            
+        }
+    }
+    
+    func addCloser(){
+        closeButton = UIButton(frame: CGRect(x: skView.bounds.width / 30
+            , y:  skView.bounds.height / 20, width: 25, height: 25))
+        closeButton.setBackgroundImage(UIImage(named: "Exit"), forState: UIControlState.Normal)
+        closeButton.addTarget(self, action: Selector("close"), forControlEvents: UIControlEvents.TouchDown)
+        closeButton.transform = CGAffineTransformMakeScale(1.2,1.2);
+        
+        self.view.addSubview(closeButton)
+    }
+    // iAd Delegate Mehtods
+    
+    // When this method is invoked, the application should remove the view from the screen and tear it down.
+    // The content will be unloaded shortly after this method is called and no new content will be loaded in that view.
+    // This may occur either when the user dismisses the interstitial view via the dismiss button or
+    // if the content in the view has expired.
+    
+    func interstitialAdDidUnload(interstitialAd: ADInterstitialAd!){
+//        self.placeHolderView.removeFromSuperview()
+//        
+//        closeButton.removeFromSuperview()
+//        interstitial = nil
+        println("adDidUnload")
+        cycleInterstitial()
+    }
+    
+    
+    func interstitialAdActionDidFinish(_interstitialAd: ADInterstitialAd!){
+        placeHolderView.removeFromSuperview()
+        closeButton.removeFromSuperview()
+        interstitial = nil
+        
+        println("called just before dismissing - action finished")
+        
+    }
+    
+    // This method will be invoked when an error has occurred attempting to get advertisement content.
+    // The ADError enum lists the possible error codes.
+    func interstitialAd(interstitialAd: ADInterstitialAd!,
+        didFailWithError error: NSError!){
+            cycleInterstitial()
+    }
+    
+    
+    //Load iAd interstitial
+    func dislayiAdInterstitial() {
+        //iAd interstitial
+        presentInterlude()
+    }
+    
+    
+    func close() {
+        placeHolderView.removeFromSuperview()
+        closeButton.removeFromSuperview()
+        interstitial = nil
+        
+    }
     
 }

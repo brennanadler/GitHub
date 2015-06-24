@@ -183,7 +183,7 @@ class MainMenu: SKScene
     }
     func addHighScore(){
         
-        HighScoreBoard = UITextView(frame: CGRect(x: 16, y: 26, width: 300, height: 20))
+        HighScoreBoard = UITextView(frame: CGRect(x: 16, y: 26, width: 1200, height: 80))
         HighScoreBoard.editable = false
         HighScoreBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
         
@@ -196,7 +196,7 @@ class MainMenu: SKScene
     }
     
     func addScoreBoard(view:SKView){
-        ScoreBoarder = UITextView(frame: CGRect(x: view.bounds.width / 1.3, y: 26, width: 300, height: 20))
+        ScoreBoarder = UITextView(frame: CGRect(x: view.bounds.width / 1.3, y: 26, width: 1200, height: 80))
         ScoreBoarder.editable = false
         ScoreBoarder.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
         if(PreviousScore != nil){

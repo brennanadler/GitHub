@@ -1,13 +1,13 @@
 import Foundation
 import SpriteKit
 
-class Bat: SKSpriteNode {
+class Wolf: SKSpriteNode {
     
     
-    class func createEnemy(location: CGPoint) -> Bat {
+    class func createEnemy(location: CGPoint) -> Wolf {
         let heroAtlas = SKTextureAtlas(named: "wizard.atlas")
         
-        let sprite = Bat(texture: heroAtlas.textureNamed("10XBat1"))
+        let sprite = Wolf(texture: heroAtlas.textureNamed("wolf"))
         sprite.position = location
         let spriteSize = CGSizeMake(sprite.size.width, sprite.size.height)
         let spriteCenter = CGPointMake(sprite.position.x/2, sprite.position.y/2)
@@ -27,14 +27,14 @@ class Bat: SKSpriteNode {
             //physics.collisionBitMask = 0
         }
         
-        let bat_anim = SKAction.animateWithTextures([
-            heroAtlas.textureNamed("10XBat1"),
-            heroAtlas.textureNamed("10XBat2")
+        let wolf_anim = SKAction.animateWithTextures([
+            heroAtlas.textureNamed("wolf2"),
+            heroAtlas.textureNamed("wolf")
             ], timePerFrame: 0.12)
         
-        let run = SKAction.repeatActionForever(bat_anim)
+        let run = SKAction.repeatActionForever(wolf_anim)
         
-        sprite.runAction(run, withKey: "bat")
+        sprite.runAction(run, withKey: "wolf")
         
         sprite.xScale = 0.4
         sprite.yScale = 0.4

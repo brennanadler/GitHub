@@ -1,251 +1,315 @@
-//
-//  MainMenu.swift
-//  GitHub
-//
-//  Created by Brennan Adler on 4/17/15.
-//  Copyright (c) 2015 Brennan Adler. All rights reserved.
-//
-
-import SpriteKit
-
-extension SKNode {
-    class func unarchiveFromFile(file : String) -> SKNode? {
-        if let path = NSBundle.mainBundle().pathForResource(file, ofType: "sks") {
-            var sceneData = NSData(contentsOfFile: path, options: .DataReadingMappedIfSafe, error: nil)!
-            var archiver = NSKeyedUnarchiver(forReadingWithData: sceneData)
+    //
+    //  ShopMenu.swift
+    //  GitHub
+    //
+    //  Created by Brennan Adler on 4/18/15.
+    //  Copyright (c) 2015 Brennan Adler. All rights reserved.
+    //
+    
+    import SpriteKit
+    
+    
+    class ShoppingMenu: SKScene
+    {
+        var Screen: SKSpriteNode!
+        var ShopButton1: SKSpriteNode!
+        var ShopButton2: SKSpriteNode!
+        var ShopButton3: SKSpriteNode!
+        var ExitButton1: SKSpriteNode!
+        var BackButton1: SKSpriteNode!
+        var Fireskin: SKSpriteNode!
+        var DefaultSkin:SKSpriteNode!
+        var Price: UITextView!
+        var Price1: UITextView!
+        var GemCount: Int = NSUserDefaults.standardUserDefaults().integerForKey("Gems")
+        
+        //variables for the gem counter at the bottom
+        var gem: SKSpriteNode!
+        var gemDefault: SKSpriteNode!
+        var GemBoard: UITextView!
+        
+        let heroAtlas = SKTextureAtlas(named: "wizard.atlas")
+        let xScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("xScale"))
+        let yScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("yScale"))
+        
+        override func didMoveToView(view: SKView)
+        {
+            Screen = SKSpriteNode()
+            self.addChild(Screen)
+            addBg(view)
+        }
+        
+        func addBg(view: SKView){
             
-            archiver.setClass(self.classForKeyedUnarchiver(), forClassName: "SKScene")
-            let scene = archiver.decodeObjectForKey(NSKeyedArchiveRootObjectKey) as! GameScene
-            archiver.finishDecoding()
-            return scene
-        } else {
-            return nil
+            ShopButton1 = SKSpriteNode(texture: heroAtlas.textureNamed("ShopButton"))
+            ShopButton1.position = CGPointMake(view.bounds.width/6, view.bounds.height/2)
+            ShopButton1.name = "ShopButton1"
+            ShopButton1.xScale = xScaler
+            ShopButton1.yScale = yScaler
+            Screen.addChild(ShopButton1)
+            
+            ShopButton2 = SKSpriteNode(texture: heroAtlas.textureNamed("ShopButton"))
+            ShopButton2.position = CGPointMake(view.bounds.width/2, view.bounds.height/2)
+            ShopButton2.name = "ShopButton2"
+            ShopButton2.xScale = xScaler
+            ShopButton2.yScale = yScaler
+            Screen.addChild(ShopButton2)
+            
+            ShopButton3 = SKSpriteNode(texture: heroAtlas.textureNamed("ShopButton"))
+            ShopButton3.position = CGPointMake(view.bounds.width * (5/6), view.bounds.height/2)
+            ShopButton3.name = "ShopButton3"
+            ShopButton3.xScale = xScaler
+            ShopButton3.yScale = yScaler
+            Screen.addChild(ShopButton3)
+            
+            ExitButton1 = SKSpriteNode( texture: heroAtlas.textureNamed("ExitButton"))
+            ExitButton1.position = CGPointMake(view.bounds.width * (22/23), view.bounds.height * (19/20))
+            ExitButton1.name = "ExitButton1"
+            ExitButton1.xScale = xScaler
+            ExitButton1.yScale = xScaler
+            Screen.addChild(ExitButton1)
+            
+            
+            
+            gem = SKSpriteNode(texture: heroAtlas.textureNamed("Gem"))
+            gem.position = CGPointMake(view.bounds.width * (1/30), view.bounds.height/16)
+            gem.xScale = xScaler
+            gem.yScale = yScaler
+            Screen.addChild(gem)
+            
+            GemBoard = UITextView(frame: CGRect(x: view.bounds.width / 15, y: view.bounds.height * (59/64), width: 300, height: 20))
+            GemBoard.editable = false
+            GemBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
+            GemBoard.textColor = UIColor.greenColor()
+            let Gemcount = NSUserDefaults.standardUserDefaults().integerForKey("Gems")
+            GemBoard.text = "\(Gemcount)"
+            view.addSubview(GemBoard)
         }
-    }
-}
-
-class MainMenu: SKScene
-{
-    let heroAtlas = SKTextureAtlas(named: "wizard.atlas")
-    var Screen: SKSpriteNode!
-    
-    //Scoreboard/highscore vars
-    var ScoreBoarder: UITextView!
-    var PreviousScore: Int!
-    var HighScoreBoard: UITextView!
-    
-    //Gem variables
-    var GemBoard: UITextView!
-    var gem:SKSpriteNode!
-    
-    //Keeps track of whether the game has run at least once (So ads wont load immediately)
-    var GameNumber: Int?
-
-    //For cross platform (iPhone, iPad, etc.)
-    let xScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("xScale"))
-    let yScaler:CGFloat = CGFloat(NSUserDefaults.standardUserDefaults().floatForKey("yScale"))
-    
-    
-    override func didMoveToView(view: SKView)
-    {
-        Screen = SKSpriteNode()
-        self.addChild(Screen)
-        addBackground()
-        addHighScore()
-        addScoreBoard(view)
-        addGemBoard(view)
-        addStartButton()
-        addOptionButton()
-        addStoreButton()
         
-        
-        var randomnumber:UInt32 = 0
-        
-        var random = arc4random_uniform(randomnumber)
-        
-        if(GameNumber > 0){
-            if((Int)(random) == 0){
-                NSNotificationCenter.defaultCenter().postNotificationName("runadsID", object: nil)
-            }
-        }
-
-    }
-    
-    
-    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)
-    {
-        
-        for touch: AnyObject in touches
+        override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)
         {
             
-            let location = touch.locationInNode(self)
-            var sprites = nodesAtPoint(location)
-            
-            for sprite in sprites
+            for touch: AnyObject in touches
             {
-                if let spriteNode = sprite as? SKSpriteNode
+                
+                let location = touch.locationInNode(self)
+                var sprites = nodesAtPoint(location)
+                
+                for sprite in sprites
                 {
-                    if spriteNode.name != nil
+                    if let spriteNode = sprite as? SKSpriteNode
                     {
-                        // Configure the view.
-                        let skView = self.view as SKView!
-                        skView.showsFPS = true
-                        skView.showsNodeCount = true
-                        if spriteNode.name == "StartButton"
+                        if spriteNode.name != nil
                         {
-            
-                            
-                            /* Sprite Kit applies additional optimizations to improve rendering performance */
-                            
-                          
-                            skView.ignoresSiblingOrder = true
-                            
-                            
-                            if let scene = GameScene.unarchiveFromFile("GameScene") as? GameScene
+                            if spriteNode.name == "ShopButton1"
                             {
-                                skView.presentScene(scene)
-                                /* Set the scale mode to scale to fit the window */
-                                scene.scaleMode = .AspectFill
-
+                                deleteButtons()
+                                skins()
+                            }else if spriteNode.name == "ShopButton2"
+                            {
+                                deleteButtons()
+                            }else if spriteNode.name == "ShopButton3"
+                            {
+                                deleteButtons()
+                            }else if spriteNode.name == "ExitButton1"
+                            {
+                                returntoMain()
+                            }else if spriteNode.name == "BackButton1"
+                            {
+                                backtoshop()
+                            }else if spriteNode.name == "FireSkin"
+                            {
+                                buySkin("2", skinValue: 100)
+                            }else if spriteNode.name == "DefaultSkin"
+                            {
+                                buySkin("1", skinValue: 0)
                             }
                             
-                        }else if(spriteNode.name == "OptionButton"){
-                            
-                            let scenery = OptionMenu()
-                            scenery.scaleMode = .AspectFill
-                            scenery.size = skView.bounds.size
-                            skView.presentScene(scenery)
-                            /* Set the scale mode to scale to fit the window */
-
-                            
-                        }else if(spriteNode.name == "ShopButton"){
-                            
-                            let sceneries = ShoppingMenu()
-                            sceneries.scaleMode = .AspectFill
-                            sceneries.size = skView.bounds.size
-                            skView.presentScene(sceneries)
-                            /* Set the scale mode to scale to fit the window */
                             
                         }
-                        
-                        ScoreBoarder.removeFromSuperview()
-                        HighScoreBoard.removeFromSuperview()
-                        gem.removeFromParent()
-                        GemBoard.removeFromSuperview()
-                        "removeGemFromMain"
-                        
                     }
                 }
             }
         }
-    }
-    
-    func addBackground(){
-        let MainMenu = SKSpriteNode(imageNamed: "MainMenu")
-        MainMenu.position = CGPointMake(frame.width / 2, frame.height / 2)
-        MainMenu.xScale = xScaler
-        MainMenu.yScale = yScaler
-        MainMenu.zPosition = 3
-        addChild(MainMenu)
-    }
-    
-    func addStartButton(){
-        var StartButton: SKSpriteNode!
-        StartButton = SKSpriteNode(texture: heroAtlas.textureNamed("Start"))
-        StartButton.position = CGPointMake(frame.width / 2, frame.height / 2.4)
-        StartButton.name = "StartButton"
-        StartButton.xScale = xScaler
-        StartButton.yScale = yScaler
-        StartButton.zPosition = 3
-        addChild(StartButton)
-    }
-    
-    func addOptionButton(){
-        var OptionButton: SKSpriteNode!
-        OptionButton = SKSpriteNode(texture: heroAtlas.textureNamed("Options"))
-        OptionButton.position = CGPointMake(frame.width / 2, frame.height / 3.44)
-        OptionButton.name = "OptionButton"
-        OptionButton.xScale = xScaler
-        OptionButton.yScale = yScaler
-        OptionButton.zPosition = 3
-        addChild(OptionButton)
-    }
-    
-    func addStoreButton(){
-        var ShopButton: SKSpriteNode!
-        ShopButton = SKSpriteNode(texture: heroAtlas.textureNamed("Shop"))
-        ShopButton.position = CGPointMake(frame.width / 2, frame.height / 6)
-        ShopButton.name = "ShopButton"
-        ShopButton.xScale = xScaler
-        ShopButton.yScale = yScaler
-        ShopButton.zPosition = 3
-        addChild(ShopButton)
-    }
-    func addHighScore(){
         
-        HighScoreBoard = UITextView(frame: CGRect(x: 16, y: 26, width: 300, height: 20))
-        HighScoreBoard.editable = false
-        HighScoreBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
-        
-        //this variable draws from the permanent value created earlier for Highscore
-        var HScore: Int = NSUserDefaults.standardUserDefaults().integerForKey("HighScore")
-        HighScoreBoard.text = "High Score: \(HScore)"
-        HighScoreBoard.textColor = UIColor.blackColor()
-        self.view?.addSubview(HighScoreBoard)
-        
-    }
-    
-    func addScoreBoard(view:SKView){
-        ScoreBoarder = UITextView(frame: CGRect(x: view.bounds.width / 1.3, y: 26, width: 300, height: 20))
-        ScoreBoarder.editable = false
-        ScoreBoarder.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
-        if(PreviousScore != nil){
-            ScoreBoarder.text = "Previous: \(PreviousScore)"
-        }
-        ScoreBoarder.textColor = UIColor.blackColor()
-        self.view?.addSubview(ScoreBoarder)
-    }
-    
-    func addGemBoard(view: SKView){
-        gem = SKSpriteNode(texture: heroAtlas.textureNamed("Gem"))
-        gem.position = CGPointMake(view.bounds.width * (1/30), view.bounds.height/16)
-        gem.xScale = xScaler
-        gem.yScale = yScaler
-        gem.zPosition = 3
-        Screen.addChild(gem)
-        
-        GemBoard = UITextView(frame: CGRect(x: view.bounds.width / 15, y: view.bounds.height * (59/64), width: view.bounds.width / 2, height: 20))
-        GemBoard.editable = false
-        GemBoard.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
-        GemBoard.textColor = UIColor.greenColor()
-        let Gemcount = NSUserDefaults.standardUserDefaults().integerForKey("Gems")
-        GemBoard.text = "\(Gemcount)"
-        view.addSubview(GemBoard)
-    }
-    func updateHScore(PScore:Int){
-        PreviousScore = PScore
-
-        
-        //takes previous HighScore Value and compares it to the previous score to see if a new highscore was set
-        var preHScore: Int = NSUserDefaults.standardUserDefaults().integerForKey("HighScore")
-        if(PScore >  preHScore){
+        func deleteButtons(){
+            ShopButton1.removeFromParent()
+            ShopButton2.removeFromParent()
+            ShopButton3.removeFromParent()
             
-            //sets new highscore value
-            NSUserDefaults.standardUserDefaults().setObject(PScore, forKey: "HighScore")
-
+            BackButton1 = SKSpriteNode( texture: heroAtlas.textureNamed("return"))
+            BackButton1.position = CGPointMake(view!.bounds.width * (1/14), view!.bounds.height * (19/20))
+            BackButton1.name = "BackButton1"
+            BackButton1.xScale =  xScaler
+            BackButton1.yScale =  xScaler
+            Screen.addChild(BackButton1)
         }
-        var Gems:Int = NSUserDefaults.standardUserDefaults().integerForKey("Gems")
-        Gems = Gems + Int(PScore/1000)
-        NSUserDefaults.standardUserDefaults().setInteger(Gems, forKey: "Gems")
         
-        GameNumber = 1
+        func returntoMain(){
+            let scene = MainMenu()
+            // Configure the view.
+            let skView = self.view as SKView!
+            skView.showsFPS = true
+            skView.showsNodeCount = true
+            
+            /* Sprite Kit applies additional optimizations to improve rendering performance */
+            skView.ignoresSiblingOrder = true
+            
+            /* Set the scale mode to scale to fit the window */
+            scene.scaleMode = .AspectFill
+            scene.size = skView.bounds.size
+            
+            GemBoard.removeFromSuperview()
+            scene.updateHScore(0)
+            
+            if(Price != nil){
+                Price.removeFromSuperview()
+                Price1.removeFromSuperview()
+            }
+
+            skView.presentScene(scene)
+            
+            
+        }
+        
+        func backtoshop(){
+            
+            let scene = ShoppingMenu()
+            // Configure the view.
+            let skView = self.view as SKView!
+            skView.showsFPS = true
+            skView.showsNodeCount = true
+            
+            /* Sprite Kit applies additional optimizations to improve rendering performance */
+            skView.ignoresSiblingOrder = true
+            
+            /* Set the scale mode to scale to fit the window */
+            scene.scaleMode = .AspectFill
+            scene.size = skView.bounds.size
+            
+            if(Price != nil){
+                Price.removeFromSuperview()
+                Price1.removeFromSuperview()
+            }
+            
+            GemBoard.removeFromSuperview()
+            skView.presentScene(scene)
+            
+        }
+        
+        //adds skins visibly to screen
+        func skins(){
+            
+            if let skinnerSet = NSUserDefaults.standardUserDefaults().dictionaryForKey("skins"){
+
+                Fireskin = SKSpriteNode( texture: heroAtlas.textureNamed("10Xmini_wizard_2"))
+                Fireskin.position = CGPointMake(view!.bounds.width * (1/2), view!.bounds.height * (4/5))
+                Fireskin.name = "FireSkin"
+                Fireskin.xScale = 0.3 * xScaler
+                Fireskin.yScale = 0.3 * xScaler
+                Screen.addChild(Fireskin)
+                
+                let fireSkinID: String = "2"
+                let isFireBought: Int = skinnerSet[fireSkinID]! as! Int
+                
+                if(isFireBought == 0){
+                    gemDefault = SKSpriteNode(texture: heroAtlas.textureNamed("Gem"))
+                    gemDefault.position = CGPointMake(self.view!.bounds.width * (47/100), self.view!.bounds.height * (63/100))
+                    gemDefault.xScale = xScaler
+                    gemDefault.yScale = yScaler
+                    Screen.addChild(gemDefault)
+                    
+                    Price = UITextView(frame: CGRect(x: view!.bounds.width * (50/100), y: view!.bounds.height * (35/100), width: 300, height: 20))
+                    Price.text = "100"
+                    Price.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
+                    Price.textColor = UIColor.greenColor()
+                    Price.editable = false
+                    view!.addSubview(Price)
+                }else{
+                    Price = UITextView(frame: CGRect(x: view!.bounds.width * (45/100), y: view!.bounds.height * (35/100), width: 300, height: 20))
+                    Price.editable = false
+                    Price.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
+                    Price.textColor = UIColor.greenColor()
+                    Price.text = "Owned"
+                    view!.addSubview(Price)
+                }
+                
+                
+            }else{
+                
+            }
+            
+            
+            
+            DefaultSkin = SKSpriteNode( texture: heroAtlas.textureNamed("10Xmini_wizard_1"))
+            DefaultSkin.position = CGPointMake(view!.bounds.width * (25/100), view!.bounds.height * (80/100))
+            DefaultSkin.name = "DefaultSkin"
+            DefaultSkin.xScale = 0.3 * xScaler
+            DefaultSkin.yScale = 0.3 * xScaler
+            Screen.addChild(DefaultSkin)
+            
+            
+            Price1 = UITextView(frame: CGRect(x: view!.bounds.width * (20/100), y: view!.bounds.height * (35/100), width: 300, height: 20))
+            Price1.editable = false
+            Price1.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
+            Price1.textColor = UIColor.greenColor()
+            Price1.text = "Owned"
+            view!.addSubview(Price1)
+            
+            
+        }
+        
+        func buySkin(skinType:String, skinValue:Int){
+
+            
+            if var skinSet = NSUserDefaults.standardUserDefaults().dictionaryForKey("skins")
+            {
+
+                if(skinSet[skinType]! as! NSObject == 0)
+                {
+                    println("you bought \(skinType)")
+                    
+                    //charge user
+                    if(GemCount >= skinValue)
+                    {
+                        GemCount = GemCount - skinValue
+                        NSUserDefaults.standardUserDefaults().setInteger(GemCount, forKey: "Gems")
+                        GemBoard.text = ("\(GemCount)")
+                        
+                        //update that user bought this
+                        skinSet[skinType] = 1
+                        NSUserDefaults.standardUserDefaults().setObject(skinSet, forKey: "skins")
+                        
+                        //code for texture
+                        NSUserDefaults.standardUserDefaults().setObject("_\(skinType)", forKey: "SkinSuffix")
+                        
+                        //update the purchased thing
+                        Price.removeFromSuperview()
+                        Price = UITextView(frame: CGRect(x: view!.bounds.width * (45/100), y: view!.bounds.height * (35/100), width: 300, height: 20))
+                        Price.editable = false
+                        Price.backgroundColor = UIColor(red: 70/255, green: 120/255, blue: 180/255, alpha: 0.0)
+                        Price.textColor = UIColor.greenColor()
+                        Price.text = "Owned"
+                        view!.addSubview(Price)
+                        gemDefault.removeFromParent()
+                        
+                    }else
+                    {
+                        println("you are broke")
+                    }
+                }else{
+                    println("already owned")
+                    NSUserDefaults.standardUserDefaults().setObject("_\(skinType)", forKey: "SkinSuffix")
+                }
+                
+
+   
+            
+        }
+
+
     }
-    
-    deinit {
-        GameNumber = 1
-        NSNotificationCenter.defaultCenter().postNotificationName("loadadsID", object: nil)
-        GemBoard.removeFromSuperview()
-    }
-    
     
 }
+    
+    

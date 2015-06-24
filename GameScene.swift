@@ -57,7 +57,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate
         //sets physics collision delegator to this class
         self.physicsWorld.contactDelegate = self
         
-        view.showsPhysics = true
+        //view.showsPhysics = true
 
         frames = 1
         time = 0
